@@ -3,29 +3,29 @@ const Schema = mongoose.Schema;
 
 const accountSchema = new Schema({
    
-    taiKhoan: {
+    account: {
         type: String,
         required: true,
         unique: true
     },
-    matKHau: {
+    password: {
         type: String,
         required: true
     },
-    ngayKhoiTao: {
+    createAt: {
         type: Date,
         required: true
     },
-    ngayCapNhat: {
+    updateAt: {
         type: Date,
         required: true
     },
-    maNguoiDung: {
+    userId: {
         type: Number,
-        required: true
+        required: false
     },
 });
 
-const User = mongoose.model('Account', accountSchema);
+const Account = mongoose.model('Account', accountSchema);
 
-export default User;
+export default Account;
