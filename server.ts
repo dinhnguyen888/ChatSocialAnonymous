@@ -3,20 +3,25 @@ import dotenv from "dotenv";
 import accountRoutes from './src/Routes/account.Route';
 import mongoose from './Database/db';
 import cors from 'cors'
+import { authenticateJWT } from "./src/Middleware/authen.Middleware";
+
+
 
 // configures dotenv to work in your application
 dotenv.config();
 const app = express();
 
+
 const PORT = process.env.PORT;
 const corsOptions = {
   origin:"localhost:3000"
 }
+app.use(express.json())
 app.use('/api',accountRoutes)
 app.use(cors(corsOptions))
 mongoose;
-
 app.use(express.static('public'))
+app.use(authenticateJWT)
 
 app.listen(PORT, () => { 
   console.log("Server running at PORT: ", PORT); 
