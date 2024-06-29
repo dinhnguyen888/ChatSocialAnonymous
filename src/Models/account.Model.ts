@@ -3,7 +3,7 @@ const Schema = mongoose.Schema;
 
 const accountSchema = new Schema({
    
-    account: {
+    email: {
         type: String,
         required: true,
         unique: true
@@ -12,19 +12,18 @@ const accountSchema = new Schema({
         type: String,
         required: true
     },
-    createAt: {
-        type: Date,
-        required: true
+
+    name:{
+        type: String,
+        require:true
     },
-    updateAt: {
-        type: Date,
-        required: true
-    },
-    userId: {
-        type: Number,
-        required: false
-    },
-});
+   
+ 
+},
+{
+    timestamps: true // Thêm tùy chọn timestamps để tự động thêm createdAt và updatedAt
+}
+);
 
 const Account = mongoose.model('Account', accountSchema);
 

@@ -1,6 +1,6 @@
 const mongoose = require('mongoose');
 
-const uri:string = 'mongodb://localhost:27017/chat'; // Thay thế 'mydatabase' bằng tên cơ sở dữ liệu của bạn
+const uri:string = 'mongodb://localhost:27017/database'; 
 
 mongoose.connect(uri, { useNewUrlParser: true, useUnifiedTopology: true })
     .then(() => {

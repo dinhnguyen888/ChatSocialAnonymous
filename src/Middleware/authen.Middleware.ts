@@ -16,6 +16,7 @@ export const authenticateJWT = (req: Request, res: Response, next: NextFunction)
         }
 
         req.user = user; // Gán thông tin người dùng vào req.user
+        console.log(req.user)
         next(); // Nếu token hợp lệ, chuyển đến middleware tiếp theo
     });
 };

@@ -50,15 +50,13 @@ export const getAccountByID = async (req: Request, res: Response): Promise<void>
     }
 };
     // Cập nhật thông tin tài khoản
-    export const updateAccount = async (req: Request, res: Response): Promise<void> => {
+    export const changePasswordAccount = async (req: Request, res: Response): Promise<void> => {
         
         try {
             const {password} = req.body;
 
-            const newPassword = await hashmapPassword(password)
-            const passwordHasHashed = {password:newPassword}
-
-            const account = await Account.findByIdAndUpdate(req.params.id, passwordHasHashed, { new: true, runValidators: true });
+           
+            const account = await Account.findByIdAndUpdate(req.params.id, { password: password }, { new: true, runValidators: true });
             if (!account) {
                 res.status(404).send({ error: 'Account not found' });
             }
@@ -67,6 +65,24 @@ export const getAccountByID = async (req: Request, res: Response): Promise<void>
             res.status(400).send(error);
         }
     };
+
+    // export const changeNameAccount = async (req: Request, res: Response): Promise<void> => {
+        
+    //     try {
+    //         const {name} = req.body;
+
+           
+    //         const account = await Account.findByIdAndUpdate(req.params.id, {name:name}, { new: true, runValidators: true });
+    //         if (!account) {
+    //             res.status(404).send({ error: 'Account not found' });
+    //         }
+            
+    //         res.send(account);
+    //     } catch (error) {
+    //         res.status(400).send(error);
+    //     }
+    // };
+
 
     // Xóa một tài khoản
     export const deleteAccount = async (req: Request, res: Response): Promise<void> => {
