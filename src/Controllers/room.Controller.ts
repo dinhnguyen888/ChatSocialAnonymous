@@ -1,6 +1,8 @@
 import Room, { IRoom } from '../Models/communityRoom.Model';
 import { Server, Socket } from 'socket.io';
-import mongoose from 'mongoose';
+import mongoose, { Mongoose } from 'mongoose';
+import Friend from '../Models/friend.Model';
+import Account from '../Models/account.Model';
 
 export const roomController = (socket: Socket, io: Server) => {
     console.log('Client connected to the server');
@@ -18,6 +20,19 @@ export const roomController = (socket: Socket, io: Server) => {
         }
     });
     
+  socket.on("getAllMemberInRoom", async (roomId) => {
+  try {
+    const room = await Room.findById(roomId).populate('participants', 'name');
+    if (!room) {
+        socket.emit("getMemberError", 'room not found')
+    }
+    console.log(room)
+    socket.emit('allMember', room?.participants)
+  } catch (error) {
+   socket.emit("getMemberError", error)
+  }
+});
+
 
     socket.on('createRoom', async (nameRoom: string, leaderId: string) => {
         try {
@@ -67,43 +82,68 @@ export const roomController = (socket: Socket, io: Server) => {
         }
     });
 
-    // socket.on('joinRoom', async ({roomId, personId}) => {
-    //     try {
-    //         const personObjectId = new mongoose.Types.ObjectId(personId);
+    socket.on('addMemberToRoom', async (roomId, friendId) => {
+        try {
+          // Convert friendId and roomId to ObjectId
+          const friendObjectId = new mongoose.Types.ObjectId(friendId);
+          const roomObjectId = new mongoose.Types.ObjectId(roomId);
+      
+          // Check if friend exists
+          const friend = await Account.findById(friendObjectId);
+          if (!friend) {
+            return socket.emit('error', 'Friend not found');
+          }
+      
+          // Check if room exists
+          const room = await Room.findById(roomObjectId);
+          if (!room) {
+            return socket.emit('error', 'Room not found');
+          }
+      
+          // Add friend to the room's participants if not already present
+          if (!room.participants.includes(friendObjectId)) {
+            room.participants.push(friendObjectId);
+            await room.save();
+      
+            // Notify the current user about the successful addition
+            socket.emit('memberAdded', `add member to ${room.roomName} success!!`);
+      
+            // Notify the newly added friend
+          
+      
+            // Notify all other participants in the room about the new member
+            room.participants.forEach(participantId => {
+              if (participantId.toString() !== friendId.toString()) {
+                io.to(participantId.toString()).emit('newMember', `${friend.name} has joined the room`);
+              }
+            });
+          } else {
+            socket.emit('error', 'Friend is already a participant');
+          }
+        } catch (error) {
+          console.error(error);
+          socket.emit('error', 'An error occurred');
+        }
+      });
+      
 
-    //         const room = await Room.findById(roomId) as IRoom;
-    //         if (room) {
-    //             if (!room.participants.includes(personObjectId)) {
-    //                 room.participants.push(personObjectId);
-    //                 await room.save();
-    //             }
-    //             socket.join(roomId);
-    //             socket.emit('joinRoomSuccess', room);
-    //             io.to(roomId).emit('userJoined', personObjectId);
-    //         } else {
-    //             socket.emit('joinRoomError', 'Room not found');
-    //         }
-    //     } catch (error) {
-    //         console.error('Error joining room:', error);
-    //         socket.emit('joinRoomError', 'Failed to join room');
-    //     }
-    // });
-
-    socket.on('leaveRoom', async (roomId: string, personId: string) => {
+      socket.on('leaveRoom', async (roomId: string, personId: string) => {
         try {
             const personObjectId = new mongoose.Types.ObjectId(personId);
-
+    
             const room = await Room.findById(roomId) as IRoom;
             if (room) {
-                const participantIndex = room.participants.indexOf(personObjectId);
+                const participantIndex = room.participants.findIndex(participant => participant.equals(personObjectId));
                 if (participantIndex > -1) {
                     room.participants.splice(participantIndex, 1);
                     await room.save();
+    
+                    socket.leave(roomId);
+                    socket.emit('leaveRoomSuccess', room.roomName);
+              
+                } else {
+                    socket.emit('leaveRoomError', 'Participant not found in room');
                 }
-
-                socket.leave(roomId);
-                socket.emit('leaveRoomSuccess', room);
-                io.to(roomId).emit('userLeft', personObjectId);
             } else {
                 socket.emit('leaveRoomError', 'Room not found');
             }
@@ -112,6 +152,7 @@ export const roomController = (socket: Socket, io: Server) => {
             socket.emit('leaveRoomError', 'Failed to leave room');
         }
     });
+    
 
     socket.on('deleteRoom', async (roomId: string) => {
         try {
@@ -149,5 +190,24 @@ export const roomController = (socket: Socket, io: Server) => {
         }
     });
 
+    socket.on('offer', ({ roomId, offer }) => {
+        socket.to(roomId).emit('offer', offer);
+    });
+
+    socket.on('answer', ({ roomId, answer }) => {
+        socket.to(roomId).emit('answer', answer);
+    });
+
+    socket.on('ice-candidate', ({ roomId, candidate }) => {
+        socket.to(roomId).emit('ice-candidate', candidate);
+    });
+
+    socket.on('join-room', ({ roomId }) => {
+        socket.join(roomId);
+    });
+
+    socket.on('leave-room', ({ roomId }) => {
+        socket.leave(roomId);
+    });
   
 };

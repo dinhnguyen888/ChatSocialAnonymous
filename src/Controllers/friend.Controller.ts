@@ -13,7 +13,7 @@ export const friendController = (socket: Socket, io: Server) => {
         try {
             const requestUserId = new mongoose.Types.ObjectId(from);
             const checkUserAvailable =  await Account.findById(to);
-            if(!checkUserAvailable){
+            if(checkUserAvailable){
                 const sendFriendRequest = await Friend.findOneAndUpdate(
                     { ownerId:to },
                     { $addToSet: { friendIdRequest: requestUserId } },
@@ -68,7 +68,7 @@ export const friendController = (socket: Socket, io: Server) => {
 
     
     // Delete friend and associated room
-    socket.on('deleteFriend', async (ownerId: string, friendId: string) => {
+    socket.on('deleteFriend', async ({ownerId, friendId}) => {
         try {
             const friendObjectId = new mongoose.Types.ObjectId(friendId);
 

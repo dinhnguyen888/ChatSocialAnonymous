@@ -46,23 +46,28 @@ export const messageController = (socket: Socket, io: Server) => {
     }
   });
 
-  socket.on('deleteMessage', async (message) => {
-    try {
-      const room = await Message.findOne({ roomId: message.roomId });
-      if (room) {
-        const messageIndex = room.message.findIndex(m => m._id!.toString() === message._id);
-        if (messageIndex !== -1) {
-          const deletedMessage = room.message.splice(messageIndex, 1);
-          await room.save();
-          io.to(message.roomId).emit('deletedMessage', message._id);
-        } else {
-          socket.emit('error', 'Message not found');
-        }
+ 
+socket.on('deleteMessage', async ({roomId,messageId}) => {
+  try {
+   
+    const messageDoc = await Message.findOne({ roomId });
+
+    if (messageDoc) {
+      const messageIndex = messageDoc.message.findIndex(msg => msg._id!.toString() === messageId);
+
+      if (messageIndex !== -1) {
+        messageDoc.message.splice(messageIndex, 1);
+        await messageDoc.save(); 
+        socket.emit('deletedMessage', messageId); 
       } else {
-        socket.emit('error', 'Room not found');
+        socket.emit('error', 'Message not found');
       }
-    } catch (error) {
-      socket.emit('error', 'An error occurred while deleting the message');
+    } else {
+      socket.emit('error', 'Room not found');
     }
-  });
+  } catch (error) {
+    console.error('An error occurred while deleting the message:', error);
+    socket.emit('error', 'An error occurred while deleting the message');
+  }
+});
 };

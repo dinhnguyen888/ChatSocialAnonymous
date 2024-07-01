@@ -19,11 +19,11 @@ const roomSchema: Schema = new Schema({
     },
     participants: [{
         type: Schema.Types.ObjectId,
-        ref: 'Friend'
+        ref: 'Account'
     }],
     leader: {
         type: Schema.Types.ObjectId,
-        ref: 'Friend',
+        ref: 'Account',
     },
     timestamp: {
         type: Date,
