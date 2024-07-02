@@ -1,9 +1,9 @@
 import express, { Request, Response } from "express";
 import dotenv from "dotenv";
-import accountRoutes from './Routes/account.Route';
-import mongoose from '../Database/db';
+import accountRoutes from './src/Routes/account.Route';
+import mongoose from './Database/db';
 import cors from 'cors';
-import {socketController} from './Controllers/socket.Controller';
+import {socketController} from './src/Controllers/socket.Controller';
 import http from 'http';
 import { Server } from 'socket.io';
 
