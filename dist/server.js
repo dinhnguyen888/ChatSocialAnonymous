@@ -5,10 +5,10 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 const express_1 = __importDefault(require("express"));
 const dotenv_1 = __importDefault(require("dotenv"));
-const account_Route_1 = __importDefault(require("./Routes/account.Route"));
-const db_1 = __importDefault(require("../Database/db"));
+const account_Route_1 = __importDefault(require("./src/Routes/account.Route"));
+const db_1 = __importDefault(require("./Database/db"));
 const cors_1 = __importDefault(require("cors"));
-const socket_Controller_1 = require("./Controllers/socket.Controller");
+const socket_Controller_1 = require("./src/Controllers/socket.Controller");
 const http_1 = __importDefault(require("http"));
 const socket_io_1 = require("socket.io");
 dotenv_1.default.config();
