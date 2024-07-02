@@ -4,7 +4,8 @@
   "description": "this is the backend for chat realtime project",
   "main": "server.js",
   "scripts": {
-    "start": "npx tsc && nodemon --inspect dist/server.js",
+   
+    "start": "npx tsc && node dist/server.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "repository": {
