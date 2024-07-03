@@ -50,8 +50,9 @@ const ChatBox: React.FC = () => {
     });
     socket.on('receiveMessage', handleReceiveMessage);
     socket.on('deletedMessage', handleDeleteMessage);
-    socket.on('allMember', (room) =>{
-        setMembers(room);
+    socket.on('allMember', (roomMember) =>{
+        
+        setMembers(roomMember);
         console.log("check member in members state", members);
     } )
     socket.on('leaveRoomSuccess', (roomName:string) => {
@@ -290,7 +291,7 @@ const ChatBox: React.FC = () => {
             <List>
               {members.map((member, index) => (
                 <ListItem key={index}>
-                  <ListItemText primary={member.name} style={currentUser.name == member.name ? {color:'blueviolet'} : {}} />
+                  <ListItemText primary={member.name} style={currentUser.name === member.name ? {color:'blueviolet'} : {}} />
                 </ListItem>
               ))}
             </List>

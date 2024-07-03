@@ -14,8 +14,8 @@ interface validateForm{
 
 
 
-const accountURL = "http://localhost:5532/api/accounts"
-const loginURL = "http://localhost:5532/api/login"
+const accountURL = "https://backendchatrealtime.onrender.com/api/accounts"
+const loginURL = "https://backendchatrealtime.onrender.com/api/login"
 
 export const getUserByID = async (_id:string) =>{
     const response = await axios.get<Account>(`${accountURL}/${_id}`)
@@ -52,13 +52,13 @@ export const login = async (email: string, password: string) => {
 
 
 export const loginWithOTP = async (email:object) =>{
-    const response = await axios.post('http://localhost:5532/api/loginOTP',email)
+    const response = await axios.post('https://backendchatrealtime.onrender.com/api/loginOTP',email)
     return response.data
 }
 
 
 export const validateOTP = async (validate:validateForm)=>{
-    const response = await axios.post('http://localhost:5532/api/validateOTP',validate)
+    const response = await axios.post('https://backendchatrealtime.onrender.com/api/validateOTP',validate)
     return response.data
 }
 

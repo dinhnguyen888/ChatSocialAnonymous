@@ -2,7 +2,7 @@
 import { io } from 'socket.io-client';
 
 
-const SERVER_URL = 'http://localhost:5532';
+const SERVER_URL = 'https://backendchatrealtime.onrender.com/';
 
 
 const socket = io(SERVER_URL, {

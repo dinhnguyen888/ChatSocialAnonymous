@@ -1,18 +1,17 @@
 import React, { useEffect, useRef, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import Peer from 'peerjs';
 import socket from '../services/socket';
 import { useChatAppStore } from '../stores/countStateStore';
-import { useRoomStore, Member } from '../stores/roomStore';
+import { useRoomStore } from '../stores/roomStore';
 
 const VideoCall: React.FC = () => {
   const localVideoRef = useRef<HTMLVideoElement>(null);
   const remoteVideoRefs = useRef<Map<string, HTMLVideoElement | null>>(new Map());
   const [localStream, setLocalStream] = useState<MediaStream | null>(null);
-  const peerConnectionsRef = useRef<Map<string, RTCPeerConnection>>(new Map());
+  const peerRef = useRef<Peer | null>(null);
   const { getRoomClicked } = useChatAppStore();
   const roomId = getRoomClicked();
-  const navigate = useNavigate();
-  const { members, setMembers } = useRoomStore();
+  const { setMembers } = useRoomStore();
 
   useEffect(() => {
     const startCall = async () => {
@@ -24,51 +23,43 @@ const VideoCall: React.FC = () => {
           localVideoRef.current.srcObject = localStream;
         }
 
-        socket.emit('join-room', { roomId });
+        const peer = new Peer();
+        peerRef.current = peer;
 
-        socket.on('all-members', (members: Member[]) => {
-          setMembers(members);
-          members.forEach((member) => {
-            if (member._id !== socket.id) {
-              createPeerConnection(member._id, localStream);
+        peer.on('open', (id) => {
+          socket.emit('join-room', { roomId, peerId: id });
+        });
+
+        peer.on('call', (call) => {
+          call.answer(localStream);
+          call.on('stream', (remoteStream) => {
+            if (!remoteVideoRefs.current.has(call.peer)) {
+              const videoElement = createVideoElement(remoteStream);
+              document.getElementById('remote-videos')?.appendChild(videoElement);
+              remoteVideoRefs.current.set(call.peer, videoElement);
             }
           });
         });
 
-        socket.on('offer', async ({ from, offer }) => {
-          const peerConnection = createPeerConnection(from, localStream);
-          await peerConnection.setRemoteDescription(new RTCSessionDescription(offer));
-          const answer = await peerConnection.createAnswer();
-          await peerConnection.setLocalDescription(new RTCSessionDescription(answer));
-          socket.emit('answer', { roomId, to: from, answer });
-        });
-
-        socket.on('answer', async ({ from, answer }) => {
-          const peerConnection = peerConnectionsRef.current.get(from);
-          if (peerConnection) {
-            await peerConnection.setRemoteDescription(new RTCSessionDescription(answer));
+        socket.on('user-joined', ({ peerId }) => {
+          if (localStream && !remoteVideoRefs.current.has(peerId)) {
+            const call = peer.call(peerId, localStream);
+            call.on('stream', (remoteStream) => {
+              if (!remoteVideoRefs.current.has(peerId)) {
+                const videoElement = createVideoElement(remoteStream);
+                document.getElementById('remote-videos')?.appendChild(videoElement);
+                remoteVideoRefs.current.set(peerId, videoElement);
+              }
+            });
           }
         });
 
-        socket.on('ice-candidate', async ({ from, candidate }) => {
-          const peerConnection = peerConnectionsRef.current.get(from);
-          if (peerConnection) {
-            await peerConnection.addIceCandidate(new RTCIceCandidate(candidate));
-          }
-        });
-
-        socket.on('user-joined', (member: Member) => {
-          if (member._id !== socket.id) {
-            const peerConnection = createPeerConnection(member._id, localStream);
-            createOffer(peerConnection, member._id);
-          }
-        });
-
-        socket.on('user-left', (id: string) => {
-          const peerConnection = peerConnectionsRef.current.get(id);
-          if (peerConnection) {
-            peerConnection.close();
-            peerConnectionsRef.current.delete(id);
+        socket.on('user-left', (peerId: string) => {
+          const videoElement = remoteVideoRefs.current.get(peerId);
+          if (videoElement) {
+            videoElement.srcObject = null;
+            remoteVideoRefs.current.delete(peerId);
+            videoElement.remove();
           }
         });
 
@@ -77,50 +68,12 @@ const VideoCall: React.FC = () => {
       }
     };
 
-    const createPeerConnection = (id: string, localStream: MediaStream) => {
-      const peerConnection = new RTCPeerConnection({
-        iceServers: [
-          {
-            urls: 'stun:stun.l.google.com:19302',
-          },
-        ],
-      });
-
-      peerConnectionsRef.current.set(id, peerConnection);
-
-      localStream.getTracks().forEach((track) => {
-        peerConnection.addTrack(track, localStream);
-      });
-
-      peerConnection.onicecandidate = (event) => {
-        if (event.candidate) {
-          socket.emit('ice-candidate', { roomId, to: id, candidate: event.candidate });
-        }
-      };
-
-      peerConnection.ontrack = (event) => {
-        const remoteStream = new MediaStream();
-        event.streams[0].getTracks().forEach((track) => {
-          remoteStream.addTrack(track);
-        });
-
-        setMembers((prevMembers) => {
-          return prevMembers.map((member) => {
-            if (member._id === id && remoteVideoRefs.current.has(id)) {
-              remoteVideoRefs.current.get(id)!.srcObject = remoteStream;
-            }
-            return member;
-          });
-        });
-      };
-
-      return peerConnection;
-    };
-
-    const createOffer = async (peerConnection: RTCPeerConnection, id: string) => {
-      const offer = await peerConnection.createOffer();
-      await peerConnection.setLocalDescription(new RTCSessionDescription(offer));
-      socket.emit('offer', { roomId, to: id, offer });
+    const createVideoElement = (stream: MediaStream) => {
+      const videoElement = document.createElement('video');
+      videoElement.srcObject = stream;
+      videoElement.autoplay = true;
+      videoElement.className = 'w-1/2 h-auto border border-gray-300';
+      return videoElement;
     };
 
     startCall();
@@ -129,10 +82,9 @@ const VideoCall: React.FC = () => {
       if (localStream) {
         localStream.getTracks().forEach((track) => track.stop());
       }
-      peerConnectionsRef.current.forEach((peerConnection) => {
-        peerConnection.close();
-      });
-      peerConnectionsRef.current.clear();
+      if (peerRef.current) {
+        peerRef.current.destroy();
+      }
       socket.emit('leave-room', { roomId });
     };
   }, [roomId, setMembers]);
@@ -141,21 +93,14 @@ const VideoCall: React.FC = () => {
     if (localStream) {
       localStream.getVideoTracks()[0].stop();
     }
-   window.close()
+    window.close();
   };
 
   return (
     <div className="h-screen flex flex-col items-center justify-center bg-gray-100">
       <div className="flex flex-row gap-4">
         <video ref={localVideoRef} autoPlay muted className="w-1/2 h-auto border border-gray-300" />
-        {members.map((member) => (
-          <video
-            key={member._id}
-            ref={(el) => remoteVideoRefs.current.set(member._id, el)}
-            autoPlay
-            className="w-1/2 h-auto border border-gray-300"
-          />
-        ))}
+        <div id="remote-videos" className="flex flex-row gap-4"></div>
       </div>
       <button
         onClick={handleEndCall}

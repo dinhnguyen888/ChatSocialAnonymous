@@ -20,11 +20,11 @@ const FriendList: React.FC = () => {
   const [openDialog, setOpenDialog] = useState(false);
   const getUserData = useUserStore((state) => state.getUserData);
   const {getFriends,setFriends,addFriend} = useFriendStore()
- 
+  const {members, setMembers} = useRoomStore();
   const { friendRooms, chatRooms, setFriendRooms, setChatRooms,getFriendRooms,getChatRooms, addFriendRoom, addChatRoom } = useRoomStore();
   
   const userData = getUserData();
-  
+  const friends = getFriends();
   
   
   useEffect(() => {
@@ -102,7 +102,8 @@ const FriendList: React.FC = () => {
   }, [setFriendRooms, setChatRooms]);
 
   const handleClick = (room:Room) => {
-    
+    // setMembers(friends)
+    // console.log('check friendMember>>>>>>>>>>>>', friends)
     setSelectedItem(room.id);
     setRoomClicked(room.id.toString())
     const userId = userData.id;
