@@ -8,7 +8,7 @@ import ChatBox from './chatBox';
 import MenuButton from './menuButton';
 import { SignUp } from './SignUp';
 import { Login } from './SignIn';
-import AddFriendOrRoom from './addRoomORFriendForm';
+
 import { useChatAppStore } from '../stores/countStateStore'; // Điều chỉnh đường dẫn tới reloadStore
 import { useMessage } from '../stores/messageStore';
 import socket from '../services/socket';
@@ -31,7 +31,7 @@ const ChatApp: React.FC = () => {
       <Route path="/video-call" element={<VideoCall />} />
         <Route path="/" element={<Login />} />
         <Route path="/sign-up" element={<SignUp />} />
-        <Route path="/add-friend-or-room" element={<AddFriendOrRoom />} />
+       
         <Route
           path="/chat"
           element={

@@ -6,7 +6,7 @@ import ChatBox from "./components/chatBox";
 import MenuButton from "./components/menuButton";
 import { SignUp } from "./components/SignUp";
 import { Login } from "./components/SignIn";
-import AddFriendOrRoom from "./components/addRoomORFriendForm";
+
 import ChatApp from "./components/ChatApp";
 
 const App: React.FC = () => {
