@@ -87,7 +87,7 @@ export const Login = () => {
       setOtpSent(true);
     } catch (error) {
       console.error('Error sending OTP:', error);
-      alert('Error sending OTP. Please try again.');
+      alert(error);
     } finally {
       setLoading(false);
     }
