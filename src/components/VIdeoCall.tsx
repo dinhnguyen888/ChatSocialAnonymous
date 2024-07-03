@@ -41,8 +41,8 @@ const VideoCall: React.FC = () => {
           });
         });
 
-        socket.on('user-joined', ({ peerId }) => {
-          if (localStream && !remoteVideoRefs.current.has(peerId)) {
+        socket.on('user-joined', ({ peerId, roomId: joinedRoomId }) => {
+          if (localStream && roomId === joinedRoomId && !remoteVideoRefs.current.has(peerId)) {
             const call = peer.call(peerId, localStream);
             call.on('stream', (remoteStream) => {
               if (!remoteVideoRefs.current.has(peerId)) {
@@ -54,12 +54,14 @@ const VideoCall: React.FC = () => {
           }
         });
 
-        socket.on('user-left', (peerId: string) => {
-          const videoElement = remoteVideoRefs.current.get(peerId);
-          if (videoElement) {
-            videoElement.srcObject = null;
-            remoteVideoRefs.current.delete(peerId);
-            videoElement.remove();
+        socket.on('user-left', ({ peerId, roomId: leftRoomId }) => {
+          if (roomId === leftRoomId) {
+            const videoElement = remoteVideoRefs.current.get(peerId);
+            if (videoElement) {
+              videoElement.srcObject = null;
+              remoteVideoRefs.current.delete(peerId);
+              videoElement.remove();
+            }
           }
         });
 
