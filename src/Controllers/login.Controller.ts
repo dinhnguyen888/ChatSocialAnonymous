@@ -72,7 +72,7 @@ export const validateOTP = async (req: Request, res: Response) => {
     const otp = req.body.otp;
     const email = req.body.email;
     const accountInServer = await Account.findOne({ email });
-
+    if(!accountInServer)  res.status(400).json({ error: 'account not found' })
     if (isNaN(otp)) {
         res.status(400).json({ error: 'A valid OTP is required' });
         return;
