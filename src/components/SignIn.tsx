@@ -97,16 +97,22 @@ export const Login = () => {
     setLoading(true);
     try {
       const response = await validateOTP({ email, otp });
+      const userAccount = await getUserByID(response.id);
+      const userData: User = {
+          id: userAccount._id!,
+          email: userAccount.email!,
+          password: userAccount.password!,
+          name: userAccount.name!,
+          token: response.token
+      };
+      setUserData(userData);
       console.log('OTP validation successful:', response);
       alert('OTP validation successful');
-      const token = response.token;
-      localStorage.setItem('token', token.toString());
-      localStorage.setItem('id', response.id);
      window.location.href = '/chat';
     //  navigate('/chat')
     } catch (error) {
       console.error('Error validating OTP:', error);
-      alert('OTP không đúng hoặc đã hết hạn sử dụng');
+      alert(error);
     } finally {
       setLoading(false);
     }
