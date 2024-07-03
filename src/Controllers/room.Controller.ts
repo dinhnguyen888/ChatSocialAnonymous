@@ -192,13 +192,13 @@ export const roomController = (socket: Socket, io: Server) => {
 
     socket.on('join-room', ({ roomId, peerId }) => {
         socket.join(roomId);
-        socket.to(roomId).emit('user-joined', { peerId });
-      });
-    
-      socket.on('leave-room', ({ roomId }) => {
+        socket.to(roomId).emit('user-joined', { peerId, roomId });
+    });
+
+    socket.on('leave-room', ({ roomId }) => {
         socket.leave(roomId);
-        socket.to(roomId).emit('user-left', socket.id);
-      });
+        socket.to(roomId).emit('user-left', { peerId: socket.id, roomId });
+    });
     
     
   
