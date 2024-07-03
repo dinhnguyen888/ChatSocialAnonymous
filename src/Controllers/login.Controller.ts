@@ -68,22 +68,34 @@ export const loginOTP = async (req: Request, res: Response): Promise<void> => {
 }
 
 
-export const validateOTP = async (req: Request, res: Response) => {
-    const otp = req.body.otp;
-    const email = req.body.email;
-    const accountInServer = await Account.findOne({ email });
-    if(!accountInServer)  res.status(400).json({ error: 'account not found' })
-    if (isNaN(otp)) {
-        res.status(400).json({ error: 'A valid OTP is required' });
-        return;
-    }
-
-    checkValidateOTP(otp, (isValid, message) => {
-        if (isValid) {
-            const token = jwt.sign({ username: req.body.email }, 'secretKey', { expiresIn: '1d' });
-            res.status(200).json({ message: 'Authentication successful', token: token, id: accountInServer?._id.toString() });
-        } else {
-            res.status(401).json({ error: message });
+export const validateOTP = async (req:Request, res:Response) => {
+    try {
+        const { otp, email } = req.body;
+        
+        // Check if account exists
+        const accountInServer = await Account.findOne({ email });
+        if (!accountInServer) {
+            res.status(400).json({ error: 'Account not found' });
+            return;
         }
-    });
+
+        // Check if OTP is a number
+        if (isNaN(otp)) {
+            res.status(400).json({ error: 'A valid OTP is required' });
+            return;
+        }
+
+        // Validate OTP
+        checkValidateOTP(otp, (isValid, message) => {
+            if (isValid) {
+                const token = jwt.sign({ username: email }, 'secretKey', { expiresIn: '1d' });
+                res.status(200).json({ message: 'Authentication successful', token: token, id: accountInServer._id.toString() });
+            } else {
+                res.status(401).json({ error: message });
+            }
+        });
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ error: 'Internal server error' });
+    }
 };
