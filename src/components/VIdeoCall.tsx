@@ -89,7 +89,7 @@ const VideoCall: React.FC = () => {
       }
       socket.emit('leave-room', { roomId });
     };
-  }, [roomId, setMembers]);
+  }, [roomId]);
 
   const handleEndCall = () => {
     if (localStream) {
