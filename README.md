@@ -13,7 +13,7 @@ A real-time chat application built with modern web technologies, offering featur
 -   Friend request system
 -   Personal information management
 
-## 💻FTachnologiss Ued
+## 💻Technology Used
 
 ### Frontend
 
