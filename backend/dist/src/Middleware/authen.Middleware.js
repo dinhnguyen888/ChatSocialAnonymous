@@ -5,13 +5,14 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.authenticateJWT = void 0;
 const jsonwebtoken_1 = __importDefault(require("jsonwebtoken"));
+const config_1 = require("../../shared/config");
 const authenticateJWT = (req, res, next) => {
     const authHeader = req.headers['authorization'];
     const token = authHeader && authHeader.split(' ')[1];
     if (token == null) {
         return res.sendStatus(401); // Nếu không có token, trả về lỗi 401 Unauthorized
     }
-    jsonwebtoken_1.default.verify(token, 'secretKey', (err, user) => {
+    jsonwebtoken_1.default.verify(token, config_1.config.jwtSecret, (err, user) => {
         if (err) {
             return res.sendStatus(403).json({ message: 'Token is not valid' }); // Nếu token không hợp lệ, trả về lỗi 403 Forbidden
         }

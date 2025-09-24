@@ -1,0 +1,26 @@
+Socket.IO - Message
+
+Namespace: default (/)
+Auth: JWT required
+
+Events
+1) Client → Server: addMessage
+- Feature: Add a message to a room
+- Input: { roomId: string, senderName: string, senderId: string, content: string }
+- Output:
+  - success: server broadcasts 'receiveMessage' to room with Message[]
+  - error: event 'error' with message
+
+2) Client → Server: readMessage
+- Feature: Fetch messages in a room
+- Input: (roomId: string)
+- Output:
+  - success: server broadcasts 'receiveMessage' to room with Message[]
+  - error: event 'error' with message
+
+3) Client → Server: deleteMessage
+- Feature: Delete a message by id in a room
+- Input: { roomId: string, messageId: string }
+- Output:
+  - success: event 'deletedMessage' with messageId
+  - error: event 'error' with message

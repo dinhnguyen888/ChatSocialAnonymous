@@ -1,0 +1,55 @@
+Socket.IO - Friend
+
+Namespace: default (/)
+Auth: JWT required
+
+Events
+1) Client → Server: sendRequest
+- Feature: Send a friend request to target user
+- Input: { to: string, from: string }
+- Output:
+  - success: event 'requestSent' with payload = updated Friend doc
+  - error: event 'sendRequestError' with message
+
+2) Client → Server: addFriend
+- Feature: Accept a friend request, create friend room
+- Input: (ownerId: string, friendId: string, ownerName: string, friendName: string)
+- Output:
+  - success: event 'friendAdded' with { owner, friend }
+  - error: event 'addFriendError' with message
+
+3) Client → Server: deleteFriend
+- Feature: Remove friend relationship and delete private room
+- Input: { ownerId: string, friendId: string }
+- Output:
+  - success: event 'friendDeleted' with { owner, friend }
+  - optional: event 'roomDeleted' with deleted room
+  - error: event 'deleteFriendError'
+
+4) Client → Server: showAllFriends
+- Feature: Fetch friend list and private friend rooms
+- Input: (userId: string)
+- Output:
+  - success: event 'allFriends' with { friends: Account[], friendRooms: { _id, friendRoomName }[] }
+  - error: event 'showAllFriendsError'
+
+5) Client → Server: showRequest
+- Feature: Fetch incoming friend requests
+- Input: (userId: string)
+- Output:
+  - success: event 'allRequests' with Account[]
+  - error: event 'showRequestError'
+
+6) Client → Server: deleteRequest
+- Feature: Remove a friend request
+- Input: (userId: string, requestUserId: string)
+- Output:
+  - success: event 'requestDeleted' with requestUserId
+  - error: event 'deleteRequestError'
+
+7) Client → Server: joinFriendRoom
+- Feature: Join a friend private room
+- Input: (friendRoomId: string)
+- Output:
+  - success: event 'joinSuccess' with friendRoomId
+  - error: event 'errorJoinFriendRoom'

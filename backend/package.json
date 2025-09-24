@@ -4,7 +4,6 @@
   "description": "this is the backend for chat realtime project",
   "main": "server.js",
   "scripts": {
-   
     "start": "npx tsc && node dist/server.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
@@ -35,6 +34,7 @@
     "@types/dotenv": "^8.2.0",
     "@types/express": "^4.17.21",
     "@types/mongoose": "^5.11.97",
+    "@types/node": "^20.19.17",
     "typescript": "^5.4.5"
   }
 }

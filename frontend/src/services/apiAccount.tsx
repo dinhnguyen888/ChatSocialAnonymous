@@ -1,4 +1,5 @@
 import axios from "axios";
+import { appConfig } from "./config";
 
 interface Account{
     _id?:string,
@@ -14,12 +15,22 @@ interface validateForm{
 
 
 
-const accountURL = "https://backendchatrealtime.onrender.com/api/accounts"
-const loginURL = "https://backendchatrealtime.onrender.com/api/login"
+const accountURL = `${appConfig.apiBaseUrl}/accounts`;
+const loginURL = `${appConfig.apiBaseUrl}/login`;
 
 export const getUserByID = async (_id:string) =>{
     const response = await axios.get<Account>(`${accountURL}/${_id}`)
     return response.data
+}
+
+export const getAccounts = async () => {
+    const token = localStorage.getItem('token');
+    const response = await axios.get<Account[]>(`${accountURL}`, {
+        headers: {
+            'Authorization': `Bearer ${token}`
+        }
+    });
+    return response.data;
 }
 
 export const deleteAccount = async (_id:string) =>{
@@ -36,10 +47,6 @@ export const createAccount = async (Account:Account) =>{
     const response = await axios.post<Account>(accountURL,Account)
     return response.data
 }
-export const updateUser = async (user:Account) =>{
-    const response = await axios.put<Account>(accountURL,user)
-    return response.data
-}
 
 export const login = async (email: string, password: string) => {
     const response = await axios.post(loginURL, {
@@ -52,13 +59,13 @@ export const login = async (email: string, password: string) => {
 
 
 export const loginWithOTP = async (email:object) =>{
-    const response = await axios.post('https://backendchatrealtime.onrender.com/api/loginOTP',email)
+    const response = await axios.post(`${appConfig.apiBaseUrl}/loginOTP`,email)
     return response.data
 }
 
 
 export const validateOTP = async (validate:validateForm)=>{
-    const response = await axios.post('https://backendchatrealtime.onrender.com/api/validateOTP',validate)
+    const response = await axios.post(`${appConfig.apiBaseUrl}/validateOTP`,validate)
     return response.data
 }
 
@@ -67,11 +74,6 @@ export const changePasswordAccount = async (_id: string, password: string) => {
     const response = await axios.put<Account>(`${accountURL}/change-password/${_id}`, { password });
     return response.data;
 };
-
-export const changeNameAccount = async (_id: string, name: string) => {
-    const response = await axios.put<Account>(`${accountURL}/change-name/${_id}`, { name });
-    return response.data;
-  };
 
 
 // export const changePassword = async (id:string, password:string) => {

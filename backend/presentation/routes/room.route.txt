@@ -1,0 +1,62 @@
+Socket.IO - Room
+
+Namespace: default (/)
+Auth: JWT required
+
+Events
+1) Client → Server: getAllRoomById
+- Feature: Fetch all rooms for a user
+- Input: (_id: string)
+- Output:
+  - success: event 'allRoomsById' with Room[]
+  - error: event 'getAllRoomByIdError'
+
+2) Client → Server: getAllMemberInRoom
+- Feature: Fetch all members of a room
+- Input: (roomId: string)
+- Output:
+  - success: event 'allMember' with Account[] (name)
+  - error: event 'getMemberError'
+
+3) Client → Server: createRoom
+- Feature: Create a room with leader
+- Input: (nameRoom: string, leaderId: string)
+- Output:
+  - success: broadcast event 'roomCreated' with Room
+  - error: event 'createRoomError'
+
+4) Client → Server: joinRoom
+- Feature: Join a room
+- Input: { roomId: string, personId: string }
+- Output:
+  - success: event 'joinRoomSuccess' with roomId
+  - notify: broadcast 'userJoined' with user id (optional if needed)
+  - error: event 'joinRoomError'
+
+5) Client → Server: addMemberToRoom
+- Feature: Add a member to a room
+- Input: (roomId: string, friendId: string)
+- Output:
+  - success: event 'memberAdded' with message
+  - error: event 'error' with message
+
+6) Client → Server: leaveRoom
+- Feature: Leave a room
+- Input: (roomId: string, personId: string)
+- Output:
+  - success: event 'leaveRoomSuccess' with room name
+  - error: event 'leaveRoomError'
+
+7) Client → Server: deleteRoom
+- Feature: Delete a room
+- Input: (roomId: string)
+- Output:
+  - success: broadcast 'roomDeleted' with Room
+  - error: event 'deleteRoomError'
+
+8) Client → Server: changeNameRoom
+- Feature: Rename a room
+- Input: (roomId: string, nameRoom: string)
+- Output:
+  - success: 'roomNameChanged' with updated Room
+  - error: 'changeNameRoomError'

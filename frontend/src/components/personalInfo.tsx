@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Box, TextField, Button, Typography, Paper, Grid, IconButton } from '@mui/material';
 import EditIcon from '@mui/icons-material/Edit';
 import CheckIcon from '@mui/icons-material/Check';
-import { changePasswordAccount, changeNameAccount } from '../services/apiAccount'; // Adjust the path as necessary
+import { changePasswordAccount } from '../services/apiAccount'; // Adjust the path as necessary
 import { useUserStore } from '../stores/userStore';
 
 const PersonalInfo: React.FC = () => {

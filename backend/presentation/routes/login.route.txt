@@ -1,0 +1,23 @@
+Socket.IO - Authentication (login)
+
+Namespace: default (/)
+Auth: JWT required in handshake auth.token (Bearer token supported via Authorization header)
+
+Events
+1) Client → Server: loginOTP
+- Feature: Request an OTP be sent to email for login
+- Input (payload): { email: string }
+- Output (server → client):
+  - on success: 'OK'
+  - on error: emitted via REST endpoints only
+
+2) Client → Server: validateOTP
+- Feature: Validate OTP and receive JWT
+- Input (payload): { email: string, otp: string }
+- Output (server → client):
+  - success: { message: 'Authentication successful', token: string, id: string }
+  - error: { error: string }
+
+Notes
+- OTP flows are implemented via REST: POST /api/loginOTP, POST /api/validateOTP.
+- Socket layer is JWT-protected and assumes the client already has a token.
