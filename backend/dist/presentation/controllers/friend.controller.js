@@ -18,7 +18,10 @@ const friend_service_1 = require("../../application/services/friend.service");
 const friend_entity_1 = __importDefault(require("../../domain/models/friend.entity"));
 const friendRoom_entity_1 = __importDefault(require("../../domain/models/friendRoom.entity"));
 const friendController = (socket, io) => {
+    const isGuest = socket.user && socket.user.role === 'Guest';
     socket.on('sendRequest', (_a) => __awaiter(void 0, [_a], void 0, function* ({ to, from }) {
+        if (isGuest)
+            return socket.emit('sendRequestError', 'Guest is not allowed');
         try {
             const sendFriendRequest = yield friend_service_1.FriendService.sendRequest(to, from);
             socket.emit('requestSent', sendFriendRequest);
@@ -28,6 +31,8 @@ const friendController = (socket, io) => {
         }
     }));
     socket.on('addFriend', (ownerId, friendId, ownerName, friendName) => __awaiter(void 0, void 0, void 0, function* () {
+        if (isGuest)
+            return socket.emit('addFriendError', 'Guest is not allowed');
         try {
             const { owner, friend } = yield friend_service_1.FriendService.addFriend(ownerId, friendId, ownerName, friendName);
             socket.emit('friendAdded', { owner, friend });
@@ -37,6 +42,8 @@ const friendController = (socket, io) => {
         }
     }));
     socket.on('deleteFriend', (_b) => __awaiter(void 0, [_b], void 0, function* ({ ownerId, friendId }) {
+        if (isGuest)
+            return socket.emit('deleteFriendError', 'Guest is not allowed');
         try {
             const { owner, friend, room } = yield friend_service_1.FriendService.deleteFriend(ownerId, friendId);
             if (room)
@@ -69,6 +76,8 @@ const friendController = (socket, io) => {
         }
     }));
     socket.on('showRequest', (userId) => __awaiter(void 0, void 0, void 0, function* () {
+        if (isGuest)
+            return socket.emit('allRequests', []);
         try {
             const requests = yield friend_entity_1.default.findOne({ ownerId: userId }).populate('friendIdRequest', 'name');
             if (requests) {
@@ -84,6 +93,8 @@ const friendController = (socket, io) => {
         }
     }));
     socket.on('deleteRequest', (userId, requestUserId) => __awaiter(void 0, void 0, void 0, function* () {
+        if (isGuest)
+            return socket.emit('deleteRequestError', 'Guest is not allowed');
         try {
             const requestObjectId = new mongoose_1.default.Types.ObjectId(requestUserId);
             const user = yield friend_entity_1.default.findOneAndUpdate({ ownerId: userId }, { $pull: { friendIdRequest: requestObjectId } }, { new: true });

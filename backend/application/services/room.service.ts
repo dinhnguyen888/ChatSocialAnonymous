@@ -3,6 +3,12 @@ import mongoose from 'mongoose';
 import Account from '../../domain/models/account.entity';
 
 export const RoomService = {
+  async ensureGeneralRoom() {
+    const existing = await Room.findOne({ roomName: '/general' });
+    if (existing) return existing;
+    const newRoom = new Room({ roomName: '/general', participants: [] });
+    return await newRoom.save();
+  },
   async listByUserId(userId: string) {
     const userObjectId = new mongoose.Types.ObjectId(userId);
     return await Room.find({ participants: userObjectId }).exec();
@@ -28,6 +34,11 @@ export const RoomService = {
       await room.save();
     }
     return room;
+  },
+
+  async autoJoinGeneral(personId: string) {
+    const general = await this.ensureGeneralRoom();
+    return await this.joinRoom((general as any)._id.toString(), personId);
   },
 
   async addMember(roomId: string, friendId: string) {

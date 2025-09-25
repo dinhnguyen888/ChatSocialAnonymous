@@ -18,22 +18,27 @@ const jsonwebtoken_1 = __importDefault(require("jsonwebtoken"));
 const config_1 = require("../../shared/config");
 const otp_util_1 = require("../../shared/utils/otp.util");
 exports.AuthService = {
-    login(email, password) {
+    guestQuickStart(name) {
         return __awaiter(this, void 0, void 0, function* () {
-            const account = yield account_entity_1.default.findOne({ email });
-            if (!account)
-                return { error: 'Account not found', status: 404 };
-            if (account.password !== password)
-                return { error: 'Invalid password', status: 401 };
-            const token = jsonwebtoken_1.default.sign({ username: email }, config_1.config.jwtSecret, { expiresIn: '1d' });
+            const displayName = name && name.trim() ? name.trim() : `Guest-${Math.floor(Math.random() * 100000)}`;
+            const guestEmail = `guest-${Date.now()}-${Math.floor(Math.random() * 100000)}@temp.local`;
+            const account = yield account_entity_1.default.create({ name: displayName, role: 'Guest', email: guestEmail });
+            const token = jsonwebtoken_1.default.sign({ username: displayName, id: account._id.toString(), role: 'Guest' }, config_1.config.jwtSecret, { expiresIn: '12h' });
             return { token, id: account._id.toString(), status: 200 };
         });
     },
-    sendLoginOtp(email) {
+    sendLoginOtp(email, name) {
         return __awaiter(this, void 0, void 0, function* () {
-            const account = yield account_entity_1.default.findOne({ email });
-            if (!email || !account)
+            if (!email)
                 return { error: 'Email is required', status: 400 };
+            let account = yield account_entity_1.default.findOne({ email });
+            if (!account) {
+                account = yield account_entity_1.default.create({ email, name: name || '', role: 'User' });
+            }
+            else if (name && !account.name) {
+                account.name = name;
+                yield account.save();
+            }
             const ok = yield (0, otp_util_1.sendOtp)(email);
             return ok ? { ok: true, status: 200 } : { error: 'Failed', status: 500 };
         });
@@ -42,8 +47,12 @@ exports.AuthService = {
         return new Promise((resolve) => {
             (0, otp_util_1.checkValidateOTP)(otp, (isValid, message) => {
                 if (isValid) {
-                    const token = jsonwebtoken_1.default.sign({ username: email }, config_1.config.jwtSecret, { expiresIn: '1d' });
-                    resolve({ token, id: '', status: 200 });
+                    resolve(account_entity_1.default.findOne({ email }).then((acc) => {
+                        if (!acc)
+                            return { error: 'Account not found', status: 404 };
+                        const token = jsonwebtoken_1.default.sign({ username: acc.email || acc.name, id: acc._id.toString(), role: acc.role || 'User' }, config_1.config.jwtSecret, { expiresIn: '1d' });
+                        return { token, id: acc._id.toString(), status: 200 };
+                    }));
                 }
                 else {
                     resolve({ error: message, status: 401 });
@@ -51,4 +60,15 @@ exports.AuthService = {
             });
         });
     },
+    deleteGuestAccount(id) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const acc = yield account_entity_1.default.findById(id);
+            if (!acc)
+                return { error: 'Not found', status: 404 };
+            if (acc.role !== 'Guest')
+                return { error: 'Not a guest', status: 400 };
+            yield account_entity_1.default.findByIdAndDelete(id);
+            return { ok: true, status: 200 };
+        });
+    }
 };

@@ -14,7 +14,7 @@ import Container from '@mui/material/Container';
 import CircularProgress from '@mui/material/CircularProgress';
 import { createTheme, ThemeProvider } from '@mui/material/styles';
 import { Link, useNavigate } from 'react-router-dom';
-import { getUserByID, login, loginWithOTP, validateOTP } from '../services/apiAccount';
+import { getUserByID, guestQuickStart, loginWithOTP, validateOTP } from '../services/apiAccount';
 import socket, { setSocketAuthToken } from '../services/socket';
 import {useUserStore, User} from '../stores/userStore';
 
@@ -35,7 +35,7 @@ const defaultTheme = createTheme();
 
 export const Login = () => {
   const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
+  const [name, setName] = useState('');
   const [rememberMe, setRememberMe] = useState(false);
   const [otpMode, setOtpMode] = useState(false);
   const [otpSent, setOtpSent] = useState(false);
@@ -55,14 +55,15 @@ export const Login = () => {
     event.preventDefault();
     setLoading(true);
     try {
-      const response = await login(email, password);
+      const response = await guestQuickStart(name);
       const userAccount = await getUserByID(response.id);
       const userData: User = {
           id: userAccount._id!,
-          email: userAccount.email!,
-          password: userAccount.password!,
-          name: userAccount.name!,
-          token: response.token
+          email: userAccount.email || '',
+          password: userAccount.password || '',
+          name: userAccount.name || name,
+          token: response.token,
+          role: 'Guest'
       };
       setUserData(userData);
       // refresh socket auth and reconnect using the new JWT
@@ -72,14 +73,14 @@ export const Login = () => {
       socket.emit('showAllFriends', userData.id);
       socket.emit('getAllRoomById', userData.id);
       socket.emit('showRequest', userData.id);
-      console.log('Login successful:', response);
+      console.log('Guest quickstart successful:', response);
       console.log('Check user account info:', userAccount);
       console.log('Check user data:', userData);
-      alert('Login successfully');
+      alert('Welcome, Guest!');
       navigate('/chat');
     } catch (error) {
-      console.error('Error during login:', error);
-      alert('Password or email incorrect');
+      console.error('Error during guest quickstart:', error);
+      alert('Guest quickstart failed');
     } finally {
       setLoading(false);
     }
@@ -89,7 +90,7 @@ export const Login = () => {
   const handleSendOtp = async () => {
     setLoading(true);
     try {
-      await loginWithOTP({ email });
+      await loginWithOTP({ email, name });
       console.log('OTP sent');
       alert(`OTP was sent to ${email}`);
       setOtpSent(true);
@@ -111,7 +112,8 @@ export const Login = () => {
           email: userAccount.email!,
           password: userAccount.password!,
           name: userAccount.name!,
-          token: response.token
+          token: response.token,
+          role: 'User'
       };
       setUserData(userData);
       // refresh socket auth and reconnect using the new JWT
@@ -162,25 +164,12 @@ export const Login = () => {
                   margin="normal"
                   required
                   fullWidth
-                  id="email"
-                  label="Email Address"
-                  name="email"
-                  autoComplete="email"
+                  id="name"
+                  label="Your Name"
+                  name="name"
                   autoFocus
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                />
-                <TextField
-                  margin="normal"
-                  required
-                  fullWidth
-                  name="password"
-                  label="Password"
-                  type="password"
-                  id="password"
-                  autoComplete="current-password"
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
+                  value={name}
+                  onChange={(e) => setName(e.target.value)}
                 />
                 <FormControlLabel
                   control={<Checkbox value="remember" color="primary" checked={rememberMe} onChange={(e) => setRememberMe(e.target.checked)} />}
@@ -193,7 +182,7 @@ export const Login = () => {
                   sx={{ mt: 3, mb: 2 }}
                   disabled={loading}
                 >
-                  {loading ? <CircularProgress size={24} /> : 'Sign In'}
+                  {loading ? <CircularProgress size={24} /> : 'Quick Start as Guest'}
                 </Button>
                 <Button
                   fullWidth
@@ -208,6 +197,16 @@ export const Login = () => {
               <>
                 {!otpSent ? (
                   <>
+                    <TextField
+                      margin="normal"
+                      required
+                      fullWidth
+                      id="name"
+                      label="Your Name"
+                      name="name"
+                      value={name}
+                      onChange={(e) => setName(e.target.value)}
+                    />
                     <TextField
                       margin="normal"
                       required

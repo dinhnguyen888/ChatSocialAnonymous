@@ -3,6 +3,7 @@ import { RoomService } from '../../application/services/room.service';
 import { IRoom } from '../../domain/models/room.entity';
 
 export const roomController = (socket: Socket, io: Server) => {
+    const isGuest = (socket as any).user && ((socket as any).user as any).role === 'Guest';
     socket.on('getAllRoomById', async (_id: string) => {
         try {
             const rooms = await RoomService.listByUserId(_id);
@@ -22,6 +23,7 @@ export const roomController = (socket: Socket, io: Server) => {
     });
 
     socket.on('createRoom', async (nameRoom: string, leaderId: string) => {
+        if (isGuest) return socket.emit('createRoomError', 'Guest is not allowed');
         try {
             const savedRoom = await RoomService.createRoom(nameRoom, leaderId);
             if (savedRoom) {
@@ -50,6 +52,7 @@ export const roomController = (socket: Socket, io: Server) => {
     });
 
     socket.on('addMemberToRoom', async (roomId, friendId) => {
+        if (isGuest) return socket.emit('error', 'Guest is not allowed');
         try {
           const result = await RoomService.addMember(roomId, friendId);
           if ('error' in result) {
@@ -77,6 +80,7 @@ export const roomController = (socket: Socket, io: Server) => {
     });
 
     socket.on('deleteRoom', async (roomId: string) => {
+        if (isGuest) return socket.emit('deleteRoomError', 'Guest is not allowed');
         try {
             const deletedRoom = await RoomService.deleteRoom(roomId);
             if (deletedRoom) {
@@ -92,6 +96,7 @@ export const roomController = (socket: Socket, io: Server) => {
     });
 
     socket.on('changeNameRoom', async (roomId: string, nameRoom: string) => {
+        if (isGuest) return socket.emit('changeNameRoomError', 'Guest is not allowed');
         try {
             const updatedRoom = await RoomService.rename(roomId, nameRoom);
             if (updatedRoom) {

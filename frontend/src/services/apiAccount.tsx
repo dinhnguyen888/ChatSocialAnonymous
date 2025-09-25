@@ -6,6 +6,7 @@ interface Account{
     email:string,
     password:string,
     name:string,
+    role?: 'Guest' | 'User'
 }
 
 interface validateForm{
@@ -48,18 +49,14 @@ export const createAccount = async (Account:Account) =>{
     return response.data
 }
 
-export const login = async (email: string, password: string) => {
-    const response = await axios.post(loginURL, {
-        email: email,
-        password: password,
-    });
-    console.log(response.data)
-    return response.data;
+export const guestQuickStart = async (name?: string) => {
+    const response = await axios.post(loginURL, { name });
+    return response.data as { token: string; id: string };
 };
 
 
-export const loginWithOTP = async (email:object) =>{
-    const response = await axios.post(`${appConfig.apiBaseUrl}/loginOTP`,email)
+export const loginWithOTP = async (payload: { email: string; name: string }) =>{
+    const response = await axios.post(`${appConfig.apiBaseUrl}/loginOTP`, payload)
     return response.data
 }
 
@@ -74,6 +71,11 @@ export const changePasswordAccount = async (_id: string, password: string) => {
     const response = await axios.put<Account>(`${accountURL}/change-password/${_id}`, { password });
     return response.data;
 };
+
+export const deleteGuestAccount = async (id: string) => {
+    const response = await axios.delete(`${appConfig.apiBaseUrl}/guest/${id}`);
+    return response.data as { ok: boolean };
+}
 
 
 // export const changePassword = async (id:string, password:string) => {

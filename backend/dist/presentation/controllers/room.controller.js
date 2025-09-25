@@ -12,6 +12,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.roomController = void 0;
 const room_service_1 = require("../../application/services/room.service");
 const roomController = (socket, io) => {
+    const isGuest = socket.user && socket.user.role === 'Guest';
     socket.on('getAllRoomById', (_id) => __awaiter(void 0, void 0, void 0, function* () {
         try {
             const rooms = yield room_service_1.RoomService.listByUserId(_id);
@@ -31,6 +32,8 @@ const roomController = (socket, io) => {
         }
     }));
     socket.on('createRoom', (nameRoom, leaderId) => __awaiter(void 0, void 0, void 0, function* () {
+        if (isGuest)
+            return socket.emit('createRoomError', 'Guest is not allowed');
         try {
             const savedRoom = yield room_service_1.RoomService.createRoom(nameRoom, leaderId);
             if (savedRoom) {
@@ -61,6 +64,8 @@ const roomController = (socket, io) => {
         }
     }));
     socket.on('addMemberToRoom', (roomId, friendId) => __awaiter(void 0, void 0, void 0, function* () {
+        if (isGuest)
+            return socket.emit('error', 'Guest is not allowed');
         try {
             const result = yield room_service_1.RoomService.addMember(roomId, friendId);
             if ('error' in result) {
@@ -89,6 +94,8 @@ const roomController = (socket, io) => {
         }
     }));
     socket.on('deleteRoom', (roomId) => __awaiter(void 0, void 0, void 0, function* () {
+        if (isGuest)
+            return socket.emit('deleteRoomError', 'Guest is not allowed');
         try {
             const deletedRoom = yield room_service_1.RoomService.deleteRoom(roomId);
             if (deletedRoom) {
@@ -105,6 +112,8 @@ const roomController = (socket, io) => {
         }
     }));
     socket.on('changeNameRoom', (roomId, nameRoom) => __awaiter(void 0, void 0, void 0, function* () {
+        if (isGuest)
+            return socket.emit('changeNameRoomError', 'Guest is not allowed');
         try {
             const updatedRoom = yield room_service_1.RoomService.rename(roomId, nameRoom);
             if (updatedRoom) {

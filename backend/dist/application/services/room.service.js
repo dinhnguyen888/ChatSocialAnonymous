@@ -17,6 +17,15 @@ const room_entity_1 = __importDefault(require("../../domain/models/room.entity")
 const mongoose_1 = __importDefault(require("mongoose"));
 const account_entity_1 = __importDefault(require("../../domain/models/account.entity"));
 exports.RoomService = {
+    ensureGeneralRoom() {
+        return __awaiter(this, void 0, void 0, function* () {
+            const existing = yield room_entity_1.default.findOne({ roomName: '/general' });
+            if (existing)
+                return existing;
+            const newRoom = new room_entity_1.default({ roomName: '/general', participants: [] });
+            return yield newRoom.save();
+        });
+    },
     listByUserId(userId) {
         return __awaiter(this, void 0, void 0, function* () {
             const userObjectId = new mongoose_1.default.Types.ObjectId(userId);
@@ -48,6 +57,12 @@ exports.RoomService = {
                 yield room.save();
             }
             return room;
+        });
+    },
+    autoJoinGeneral(personId) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const general = yield this.ensureGeneralRoom();
+            return yield this.joinRoom(general._id.toString(), personId);
         });
     },
     addMember(roomId, friendId) {

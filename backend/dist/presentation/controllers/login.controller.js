@@ -9,30 +9,33 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.validateOTP = exports.loginOTP = exports.login = void 0;
+exports.deleteGuest = exports.validateOTP = exports.loginOTP = exports.login = void 0;
 const auth_service_1 = require("../../application/services/auth.service");
+const room_service_1 = require("../../application/services/room.service");
 const login = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
-        const { email, password } = req.body;
-        if (!email || !password) {
-            res.status(400).json({ error: 'Account and password are required' });
-            return;
+        const { name } = req.body;
+        console.log('Guest quickstart attempt with name:', name);
+        const result = yield auth_service_1.AuthService.guestQuickStart(name);
+        console.log('Guest created successfully:', result.id);
+        try {
+            yield room_service_1.RoomService.autoJoinGeneral(result.id);
+            console.log('Auto-joined general room');
         }
-        const result = yield auth_service_1.AuthService.login(email, password);
-        if ('error' in result) {
-            res.status(result.status).json({ error: result.error });
-            return;
+        catch (roomError) {
+            console.log('Auto-join general room failed:', roomError);
         }
-        res.status(200).json({ message: 'Authentication successful', token: result.token, id: result.id });
+        res.status(200).json({ message: 'Guest login successful', token: result.token, id: result.id });
     }
     catch (error) {
+        console.error('Guest quickstart error:', error);
         res.status(500).json({ error: 'Internal server error' });
     }
 });
 exports.login = login;
 const loginOTP = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    const email = req.body.email;
-    const result = yield auth_service_1.AuthService.sendLoginOtp(email);
+    const { email, name } = req.body;
+    const result = yield auth_service_1.AuthService.sendLoginOtp(email, name);
     if ('error' in result) {
         res.status(result.status).json({ error: result.error });
         return;
@@ -55,3 +58,18 @@ const validateOTP = (req, res) => __awaiter(void 0, void 0, void 0, function* ()
     }
 });
 exports.validateOTP = validateOTP;
+const deleteGuest = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    try {
+        const { id } = req.params;
+        const result = yield auth_service_1.AuthService.deleteGuestAccount(id);
+        if ('error' in result) {
+            res.status(result.status).json({ error: result.error });
+            return;
+        }
+        res.status(200).json({ ok: true });
+    }
+    catch (error) {
+        res.status(500).json({ error: 'Internal server error' });
+    }
+});
+exports.deleteGuest = deleteGuest;

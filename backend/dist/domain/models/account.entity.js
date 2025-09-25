@@ -8,17 +8,26 @@ const Schema = mongoose_1.default.Schema;
 const accountSchema = new Schema({
     email: {
         type: String,
-        required: true,
-        unique: true
+        required: false,
+        unique: true,
+        sparse: true,
+        default: undefined
     },
     password: {
         type: String,
-        required: true
+        required: false,
+        default: ''
     },
     name: {
         type: String,
-        require: true
+        require: false,
+        default: ''
     },
+    role: {
+        type: String,
+        enum: ['Guest', 'User'],
+        default: 'Guest'
+    }
 }, {
     timestamps: true
 });

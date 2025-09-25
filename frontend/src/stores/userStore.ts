@@ -7,6 +7,7 @@ export interface User {
   password: string;
   name: string;
   token?: string;
+  role?: 'Guest' | 'User';
 }
 
 interface UserState {
@@ -25,7 +26,7 @@ type MyPersist = (
 export const useUserStore = create<UserState>(
   (persist as MyPersist)(
     (set, get) => ({
-      userData: { id: '', email: '', password: '', name: '', token: '' },
+      userData: { id: '', email: '', password: '', name: '', token: '', role: undefined },
       setUserData: (userData) => set({ userData }),
       updateUserData: (newUserData) => set((state: UserState) => ({
         userData: { ...state.userData, ...newUserData }

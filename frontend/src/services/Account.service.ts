@@ -5,8 +5,9 @@ export const AccountService = {
   getById: AccountApi.getAccount,
   create: (account: Account) => AccountApi.createAccount(account),
   remove: AccountApi.removeAccount,
-  login: AccountApi.login,
+  guestQuickStart: AccountApi.guestQuickStart,
   requestLoginOTP: AccountApi.requestLoginOTP,
   validateOTP: (payload: ValidateForm) => AccountApi.validateOTP(payload),
   changePassword: AccountApi.changePassword,
+  deleteGuest: AccountApi.deleteGuest,
 };

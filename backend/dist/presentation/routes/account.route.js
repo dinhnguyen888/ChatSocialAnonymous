@@ -13,4 +13,5 @@ router.delete('/accounts/:id', [account_controller_1.deleteAccount]);
 router.post('/login', login_controller_1.login);
 router.post('/loginOTP', login_controller_1.loginOTP);
 router.post('/validateOTP', login_controller_1.validateOTP);
+router.delete('/guest/:id', login_controller_1.deleteGuest);
 exports.default = router;

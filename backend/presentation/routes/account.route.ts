@@ -1,6 +1,6 @@
 import { Router } from 'express';
 import {  changePasswordAccount, createAccount, deleteAccount, getAccount, getAccountByID } from '../controllers/account.controller';
-import { login, loginOTP, validateOTP } from '../controllers/login.controller';
+import { login, loginOTP, validateOTP, deleteGuest } from '../controllers/login.controller';
 import { authenticateJWT } from '../middlewares/authen.middleware';
 
 const router = Router();
@@ -13,6 +13,7 @@ router.delete('/accounts/:id', [deleteAccount]);
 router.post('/login',login)
 router.post('/loginOTP',loginOTP)
 router.post('/validateOTP' ,validateOTP)
+router.delete('/guest/:id', deleteGuest)
 
 export default router;
 

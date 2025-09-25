@@ -5,7 +5,9 @@ import Friend from '../../domain/models/friend.entity';
 import FriendRoom from '../../domain/models/friendRoom.entity';
 
 export const friendController = (socket: Socket, io: Server) => {
+    const isGuest = (socket as any).user && ((socket as any).user as any).role === 'Guest';
     socket.on('sendRequest', async ({to, from}) => {
+        if (isGuest) return socket.emit('sendRequestError', 'Guest is not allowed');
         try {
             const sendFriendRequest = await FriendService.sendRequest(to, from);
             socket.emit('requestSent', sendFriendRequest);
@@ -15,6 +17,7 @@ export const friendController = (socket: Socket, io: Server) => {
     });
 
     socket.on('addFriend', async (ownerId: string, friendId: string, ownerName: string, friendName: string) => {
+        if (isGuest) return socket.emit('addFriendError', 'Guest is not allowed');
         try {
             const { owner, friend } = await FriendService.addFriend(ownerId, friendId, ownerName, friendName);
             socket.emit('friendAdded', { owner, friend });
@@ -24,6 +27,7 @@ export const friendController = (socket: Socket, io: Server) => {
     });
 
     socket.on('deleteFriend', async ({ownerId, friendId}) => {
+        if (isGuest) return socket.emit('deleteFriendError', 'Guest is not allowed');
         try {
             const { owner, friend, room } = await FriendService.deleteFriend(ownerId, friendId);
             if (room) socket.emit('roomDeleted', room);
@@ -54,6 +58,7 @@ export const friendController = (socket: Socket, io: Server) => {
     });
 
     socket.on('showRequest', async (userId: string) => {
+        if (isGuest) return socket.emit('allRequests', []);
         try {
             const requests = await Friend.findOne({ ownerId: userId }).populate('friendIdRequest', 'name');
             if (requests) {
@@ -68,6 +73,7 @@ export const friendController = (socket: Socket, io: Server) => {
     });
 
     socket.on('deleteRequest', async (userId: string, requestUserId: string) => {
+        if (isGuest) return socket.emit('deleteRequestError', 'Guest is not allowed');
         try {
             const requestObjectId = new mongoose.Types.ObjectId(requestUserId);
             const user = await Friend.findOneAndUpdate(

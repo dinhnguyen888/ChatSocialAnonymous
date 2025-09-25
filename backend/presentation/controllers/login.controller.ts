@@ -1,27 +1,29 @@
 import { Request, Response } from 'express';
 import { AuthService } from '../../application/services/auth.service';
+import { RoomService } from '../../application/services/room.service';
 
 export const login = async (req: Request, res: Response): Promise<void> => {
   try {
-    const { email, password } = req.body;
-    if (!email || !password) {
-      res.status(400).json({ error: 'Account and password are required' });
-      return;
+    const { name } = req.body;
+    console.log('Guest quickstart attempt with name:', name);
+    const result = await AuthService.guestQuickStart(name);
+    console.log('Guest created successfully:', result.id);
+    try { 
+      await RoomService.autoJoinGeneral(result.id); 
+      console.log('Auto-joined general room');
+    } catch (roomError) {
+      console.log('Auto-join general room failed:', roomError);
     }
-    const result = await AuthService.login(email, password);
-    if ('error' in result) {
-      res.status(result.status).json({ error: result.error });
-      return;
-    }
-    res.status(200).json({ message: 'Authentication successful', token: result.token, id: result.id });
+    res.status(200).json({ message: 'Guest login successful', token: result.token, id: result.id });
   } catch (error) {
+    console.error('Guest quickstart error:', error);
     res.status(500).json({ error: 'Internal server error' });
   }
 };
 
 export const loginOTP = async (req: Request, res: Response): Promise<void> => {
-  const email = req.body.email;
-  const result = await AuthService.sendLoginOtp(email);
+  const { email, name } = req.body;
+  const result = await AuthService.sendLoginOtp(email, name);
   if ('error' in result) {
     res.status(result.status).json({ error: result.error });
     return;
@@ -42,5 +44,19 @@ export const validateOTP = async (req:Request, res:Response) => {
     res.status(500).json({ error: 'Internal server error' });
   }
 };
+
+export const deleteGuest = async (req: Request, res: Response) => {
+  try {
+    const { id } = req.params as any;
+    const result = await AuthService.deleteGuestAccount(id);
+    if ('error' in result) {
+      res.status(result.status).json({ error: result.error });
+      return;
+    }
+    res.status(200).json({ ok: true });
+  } catch (error) {
+    res.status(500).json({ error: 'Internal server error' });
+  }
+}
 
 
