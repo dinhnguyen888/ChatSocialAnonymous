@@ -24,6 +24,7 @@ const FriendList: React.FC = () => {
   const { friendRooms, chatRooms, setFriendRooms, setChatRooms,getFriendRooms,getChatRooms, addFriendRoom, addChatRoom } = useRoomStore();
   
   const userData = getUserData();
+  const isGuest = userData?.role === 'Guest';
   const friends = getFriends();
   
   
@@ -90,6 +91,18 @@ const FriendList: React.FC = () => {
       socket.on('joinRoomSuccess', handleJoinRoom);
       socket.on('joinSuccess', handleJoinFriendRoom);
 
+      // Alerts for room creation flow
+      const handleCreateRoomError = (msg: string) => {
+        alert(msg || 'Failed to create room');
+      };
+      const handleRoomCreated = (savedRoom: { roomName: string }) => {
+        alert(`Room "${savedRoom.roomName}" created successfully`);
+        setOpenDialog(false);
+        setRoomName('');
+      };
+      socket.on('createRoomError', handleCreateRoomError);
+      socket.on('roomCreated', handleRoomCreated);
+
       return () => {
         socket.off('allFriends', handleAllFriendRooms);
         socket.off('allRoomsById', handleAllRoomsById);
@@ -97,6 +110,8 @@ const FriendList: React.FC = () => {
         socket.off('sendRequestError', handleSendRequestError);
         socket.off('joinRoomSuccess', handleJoinRoom);
         socket.off('joinSuccess', handleJoinFriendRoom);
+        socket.off('createRoomError', handleCreateRoomError);
+        socket.off('roomCreated', handleRoomCreated);
       };
     }
   }, [setFriendRooms, setChatRooms]);
@@ -130,6 +145,10 @@ const FriendList: React.FC = () => {
   };
 
   const handleSendFriendRequest = () => {
+    if (isGuest) {
+      alert('Guest accounts cannot send friend requests');
+      return;
+    }
     const userId = userData.id;
     if (userId && friendId) {
       socket.emit('sendRequest', { to: friendId, from: userId });
@@ -137,7 +156,15 @@ const FriendList: React.FC = () => {
   };
 
   const handleCreateRoom = () => {
+    if (isGuest) {
+      alert('Guest accounts cannot create rooms');
+      return;
+    }
     const userId = userData.id;
+    if (!roomName || !roomName.trim()) {
+      alert('Please enter a room name');
+      return;
+    }
     if (userId && roomName) {
       socket.emit('createRoom', roomName, userId);
     }
@@ -188,6 +215,11 @@ const FriendList: React.FC = () => {
         </Tabs>
       </DialogTitle>
       <DialogContent>
+        {isGuest && (
+          <Alert severity="info" sx={{ mb: 2 }}>
+            Guest accounts cannot send friend requests or create rooms. You can chat in /general. Link your email to unlock full features.
+          </Alert>
+        )}
         {formTab === 0 ? (
           <TextField
             label="Friend ID"
@@ -195,6 +227,7 @@ const FriendList: React.FC = () => {
             onChange={(e) => setFriendId(e.target.value)}
             fullWidth
             sx={{ mb: 2 }}
+            disabled={isGuest}
           />
         ) : (
           <TextField
@@ -203,6 +236,7 @@ const FriendList: React.FC = () => {
             onChange={(e) => setRoomName(e.target.value)}
             fullWidth
             sx={{ mb: 2 }}
+            disabled={isGuest}
           />
         )}
       </DialogContent>
@@ -211,6 +245,7 @@ const FriendList: React.FC = () => {
         <Button
           onClick={formTab === 0 ? handleSendFriendRequest : handleCreateRoom}
           color="primary"
+          disabled={isGuest}
         >
           {formTab === 0 ? 'Send Friend Request' : 'Create Room'}
         </Button>
