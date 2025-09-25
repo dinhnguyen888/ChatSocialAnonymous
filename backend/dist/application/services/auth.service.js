@@ -70,5 +70,46 @@ exports.AuthService = {
             yield account_entity_1.default.findByIdAndDelete(id);
             return { ok: true, status: 200 };
         });
+    },
+    linkEmailToGuest(guestId, email) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const guest = yield account_entity_1.default.findById(guestId);
+            if (!guest)
+                return { error: 'Guest not found', status: 404 };
+            if (guest.role !== 'Guest')
+                return { error: 'Not a guest account', status: 400 };
+            if (!email)
+                return { error: 'Email is required', status: 400 };
+            // Check if email is already taken
+            const existingAccount = yield account_entity_1.default.findOne({ email });
+            if (existingAccount)
+                return { error: 'Email already exists', status: 400 };
+            // Update guest account with email and change role to User
+            guest.email = email;
+            guest.role = 'User';
+            yield guest.save();
+            const ok = yield (0, otp_util_1.sendOtp)(email);
+            return ok ? { ok: true, status: 200 } : { error: 'Failed to send OTP', status: 500 };
+        });
+    },
+    verifyEmailLink(guestId, email, otp) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const account = yield account_entity_1.default.findById(guestId);
+            if (!account)
+                return { error: 'Account not found', status: 404 };
+            if (account.email !== email)
+                return { error: 'Email mismatch', status: 400 };
+            return new Promise((resolve) => {
+                (0, otp_util_1.checkValidateOTP)(otp, (isValid, message) => {
+                    if (isValid) {
+                        const token = jsonwebtoken_1.default.sign({ username: account.email || account.name, id: account._id.toString(), role: account.role || 'User' }, config_1.config.jwtSecret, { expiresIn: '1d' });
+                        resolve({ token, id: account._id.toString(), status: 200 });
+                    }
+                    else {
+                        resolve({ error: message, status: 401 });
+                    }
+                });
+            });
+        });
     }
 };

@@ -66,15 +66,21 @@ export const validateOTP = async (validate:validateForm)=>{
     return response.data
 }
 
-export const changePasswordAccount = async (_id: string, password: string) => {
-    // const token = localStorage.getItem('token');
-    const response = await axios.put<Account>(`${accountURL}/change-password/${_id}`, { password });
-    return response.data;
-};
+// Removed change password functionality
 
 export const deleteGuestAccount = async (id: string) => {
     const response = await axios.delete(`${appConfig.apiBaseUrl}/guest/${id}`);
     return response.data as { ok: boolean };
+}
+
+export const linkEmailToGuest = async (guestId: string, email: string) => {
+    const response = await axios.post(`${appConfig.apiBaseUrl}/link-email`, { guestId, email });
+    return response.data as { message: string };
+}
+
+export const verifyEmailLink = async (guestId: string, email: string, otp: string) => {
+    const response = await axios.post(`${appConfig.apiBaseUrl}/verify-email-link`, { guestId, email, otp });
+    return response.data as { message: string; token: string; id: string };
 }
 
 

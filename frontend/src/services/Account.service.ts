@@ -8,6 +8,7 @@ export const AccountService = {
   guestQuickStart: AccountApi.guestQuickStart,
   requestLoginOTP: AccountApi.requestLoginOTP,
   validateOTP: (payload: ValidateForm) => AccountApi.validateOTP(payload),
-  changePassword: AccountApi.changePassword,
   deleteGuest: AccountApi.deleteGuest,
+  linkEmailToGuest: AccountApi.linkEmailToGuest,
+  verifyEmailLink: AccountApi.verifyEmailLink,
 };

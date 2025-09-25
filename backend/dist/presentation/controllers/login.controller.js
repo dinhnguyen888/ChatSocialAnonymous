@@ -9,7 +9,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.deleteGuest = exports.validateOTP = exports.loginOTP = exports.login = void 0;
+exports.verifyEmailLink = exports.linkEmailToGuest = exports.deleteGuest = exports.validateOTP = exports.loginOTP = exports.login = void 0;
 const auth_service_1 = require("../../application/services/auth.service");
 const room_service_1 = require("../../application/services/room.service");
 const login = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
@@ -73,3 +73,33 @@ const deleteGuest = (req, res) => __awaiter(void 0, void 0, void 0, function* ()
     }
 });
 exports.deleteGuest = deleteGuest;
+const linkEmailToGuest = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    try {
+        const { guestId, email } = req.body;
+        const result = yield auth_service_1.AuthService.linkEmailToGuest(guestId, email);
+        if ('error' in result) {
+            res.status(result.status).json({ error: result.error });
+            return;
+        }
+        res.status(200).json({ message: 'OTP sent to email' });
+    }
+    catch (error) {
+        res.status(500).json({ error: 'Internal server error' });
+    }
+});
+exports.linkEmailToGuest = linkEmailToGuest;
+const verifyEmailLink = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    try {
+        const { guestId, email, otp } = req.body;
+        const result = yield auth_service_1.AuthService.verifyEmailLink(guestId, email, otp);
+        if ('error' in result) {
+            res.status(result.status).json({ error: result.error });
+            return;
+        }
+        res.status(200).json({ message: 'Email linked successfully', token: result.token, id: result.id });
+    }
+    catch (error) {
+        res.status(500).json({ error: 'Internal server error' });
+    }
+});
+exports.verifyEmailLink = verifyEmailLink;

@@ -10,13 +10,13 @@ import { SignUp } from './SignUp';
 import { Login } from './SignIn';
 
 import { useChatAppStore } from '../stores/countStateStore'; // Điều chỉnh đường dẫn tới reloadStore
-import { useMessage } from '../stores/messageStore';
 import socket from '../services/socket';
 import { useUserStore } from '../stores/userStore';
 import { deleteGuestAccount } from '../services/apiAccount';
+import GuestNotification from './GuestNotification.component';
 import VideoCall from './VIdeoCall';
 const ChatApp: React.FC = () => {
-  const { reload,status,checkStatus } = useChatAppStore();
+  const { reload, checkStatus } = useChatAppStore();
   const user = useUserStore((s) => s.userData);
  
 
@@ -26,7 +26,7 @@ const ChatApp: React.FC = () => {
       checkStatus()
     })
     console.log('Reloaded:', reload);
-  }, [reload]);
+  }, [reload, checkStatus]);
 
   useEffect(() => {
     const handleBeforeUnload = (e: BeforeUnloadEvent) => {
@@ -64,6 +64,7 @@ const ChatApp: React.FC = () => {
           path="/chat"
           element={
             <Box sx={{ height: '100vh' }}>
+              <GuestNotification onEmailLinked={() => window.location.reload()} />
               <Grid container sx={{ height: '100%' }}>
                 <Grid item xs={3} sx={{ borderRight: '1px solid #ddd' }}>
                   <MenuButton />
