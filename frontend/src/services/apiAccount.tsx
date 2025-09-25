@@ -83,6 +83,17 @@ export const verifyEmailLink = async (guestId: string, email: string, otp: strin
     return response.data as { message: string; token: string; id: string };
 }
 
+export const uploadImage = async (formData: FormData) => {
+    const token = localStorage.getItem('token');
+    const response = await axios.post(`${appConfig.apiBaseUrl}/upload-image`, formData, {
+        headers: {
+            'Content-Type': 'multipart/form-data',
+            'Authorization': `Bearer ${token}`
+        }
+    });
+    return response.data as { success: boolean; imageUrl: string; filename: string; size: number; message: string };
+}
+
 
 // export const changePassword = async (id:string, password:string) => {
 //     const response = await axios.put(`${accountURL}/change-password/${id}`, { password });

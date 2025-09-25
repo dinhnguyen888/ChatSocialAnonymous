@@ -2,6 +2,7 @@ import { Server, Socket } from 'socket.io';
 import { messageController } from './message.controller';
 import { roomController } from './room.controller';
 import { friendController } from './friend.controller';
+import { videoCallController } from './videoCall.controller';
 import jwt from 'jsonwebtoken';
 import { config } from '../../shared/config';
 
@@ -22,6 +23,7 @@ export const socketController = (io: Server) => {
     friendController(socket,io)
     messageController(socket,io)
     roomController(socket,io)
+    videoCallController(socket,io)
     socket.on('disconnect', () => {});
   });
 };

@@ -23,6 +23,7 @@ exports.MessageService = {
                     senderName: message.senderName,
                     senderId: message.senderId,
                     content: message.content,
+                    attachments: message.attachments || [],
                     timestamp: new Date(),
                 });
                 yield existingRoom.save();
@@ -35,6 +36,7 @@ exports.MessageService = {
                             senderName: message.senderName,
                             senderId: message.senderId,
                             content: message.content,
+                            attachments: message.attachments || [],
                             timestamp: new Date(),
                         }],
                 });

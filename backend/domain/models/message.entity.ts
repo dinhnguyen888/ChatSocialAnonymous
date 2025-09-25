@@ -18,6 +18,25 @@ const messageSchema = new Schema({
       type: String,
       required: true,
     },
+    attachments: [{
+      type: {
+        type: String,
+        enum: ['image'],
+        required: true
+      },
+      url: {
+        type: String,
+        required: true
+      },
+      filename: {
+        type: String,
+        required: true
+      },
+      size: {
+        type: Number,
+        required: true
+      }
+    }],
     timestamp: { 
       type: Date, 
       default: Date.now 

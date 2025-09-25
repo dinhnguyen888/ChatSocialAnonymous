@@ -34,6 +34,7 @@ app.use((0, cors_1.default)({
     credentials: true
 }));
 app.use('/api', account_route_1.default);
+app.use('/uploads', express_1.default.static('uploads'));
 db_1.default;
 app.use(express_1.default.static('public'));
 //connect socket.io

@@ -8,6 +8,7 @@ export const MessageService = {
         senderName: message.senderName,
         senderId: message.senderId,
         content: message.content,
+        attachments: message.attachments || [],
         timestamp: new Date(),
       });
       await existingRoom.save();
@@ -19,6 +20,7 @@ export const MessageService = {
           senderName: message.senderName,
           senderId: message.senderId,
           content: message.content,
+          attachments: message.attachments || [],
           timestamp: new Date(),
         }],
       });

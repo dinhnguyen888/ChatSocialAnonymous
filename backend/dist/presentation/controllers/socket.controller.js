@@ -7,6 +7,7 @@ exports.socketController = void 0;
 const message_controller_1 = require("./message.controller");
 const room_controller_1 = require("./room.controller");
 const friend_controller_1 = require("./friend.controller");
+const videoCall_controller_1 = require("./videoCall.controller");
 const jsonwebtoken_1 = __importDefault(require("jsonwebtoken"));
 const config_1 = require("../../shared/config");
 const socketController = (io) => {
@@ -28,6 +29,7 @@ const socketController = (io) => {
         (0, friend_controller_1.friendController)(socket, io);
         (0, message_controller_1.messageController)(socket, io);
         (0, room_controller_1.roomController)(socket, io);
+        (0, videoCall_controller_1.videoCallController)(socket, io);
         socket.on('disconnect', () => { });
     });
 };

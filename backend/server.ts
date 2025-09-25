@@ -32,6 +32,7 @@ app.use(cors({
   credentials: true
 }));
 app.use('/api', accountRoutes);
+app.use('/uploads', express.static('uploads'));
 mongoose;
 app.use(express.static('public'));
 
