@@ -18,8 +18,10 @@ const VideoCall: React.FC = () => {
   const videoRoomId = searchParams.get('roomId');
   
   const localVideoRef = useRef<HTMLVideoElement>(null);
+  const remoteVideoRef = useRef<HTMLVideoElement>(null);
   const remoteVideoRefs = useRef<Map<string, HTMLVideoElement | null>>(new Map());
   const [localStream, setLocalStream] = useState<MediaStream | null>(null);
+  const [remoteStream, setRemoteStream] = useState<MediaStream | null>(null);
   const [videoEnabled, setVideoEnabled] = useState(true);
   const [audioEnabled, setAudioEnabled] = useState(true);
   const [screenSharing, setScreenSharing] = useState(false);
@@ -86,35 +88,35 @@ const VideoCall: React.FC = () => {
 
         peer.on('call', (call) => {
           call.answer(local);
-          call.on('stream', (remoteStream) => {
-            if (!remoteVideoRefs.current.has(call.peer)) {
-              const videoElement = createVideoElement(remoteStream);
-              document.getElementById('remote-videos')?.appendChild(videoElement);
-              remoteVideoRefs.current.set(call.peer, videoElement);
+          call.on('stream', (stream) => {
+            if (!remoteStream) {
+              setRemoteStream(stream);
+              if (remoteVideoRef.current) {
+                remoteVideoRef.current.srcObject = stream;
+              }
             }
           });
         });
 
         socket.on('user-joined-video-call', ({ peerId, roomId: joinedRoomId }) => {
-          if (local && videoRoomId === joinedRoomId && !remoteVideoRefs.current.has(peerId)) {
+          if (local && videoRoomId === joinedRoomId && !remoteStream) {
             const call = peer.call(peerId, local);
-            call.on('stream', (remoteStream) => {
-              if (!remoteVideoRefs.current.has(peerId)) {
-                const videoElement = createVideoElement(remoteStream);
-                document.getElementById('remote-videos')?.appendChild(videoElement);
-                remoteVideoRefs.current.set(peerId, videoElement);
+            call.on('stream', (stream) => {
+              if (!remoteStream) {
+                setRemoteStream(stream);
+                if (remoteVideoRef.current) {
+                  remoteVideoRef.current.srcObject = stream;
+                }
               }
             });
           }
         });
 
         socket.on('user-left-video-call', ({ peerId, roomId: leftRoomId }) => {
-          if (videoRoomId === leftRoomId) {
-            const videoElement = remoteVideoRefs.current.get(peerId);
-            if (videoElement) {
-              videoElement.srcObject = null;
-              remoteVideoRefs.current.delete(peerId);
-              videoElement.remove();
+          if (videoRoomId === leftRoomId && remoteStream) {
+            setRemoteStream(null);
+            if (remoteVideoRef.current) {
+              remoteVideoRef.current.srcObject = null;
             }
           }
         });
@@ -131,13 +133,6 @@ const VideoCall: React.FC = () => {
       }
     };
 
-    const createVideoElement = (stream: MediaStream) => {
-      const videoElement = document.createElement('video');
-      videoElement.srcObject = stream;
-      videoElement.autoplay = true;
-      videoElement.className = 'w-1/2 h-auto border border-gray-300';
-      return videoElement;
-    };
 
     startCall();
 
@@ -200,6 +195,7 @@ const VideoCall: React.FC = () => {
     if (isConnected && videoRoomId) {
       socket.emit('end-video-call', { roomId: videoRoomId });
     }
+    window.close();
     window.history.back();
   };
 
@@ -233,12 +229,21 @@ const VideoCall: React.FC = () => {
   return (
     <Box sx={{ height: '100vh', bgcolor: 'background.default', p: 2 }}>
       <Stack direction="row" spacing={2} sx={{ height: '80%' }}>
-        <Paper variant="outlined" sx={{ flex: 1, p: 1, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-          <video ref={localVideoRef} autoPlay muted style={{ width: '100%', height: '100%', objectFit: 'contain' }} />
+        <Paper variant="outlined" sx={{ flex: 1, p: 1, display: 'flex', flexDirection: 'column' }}>
+          <Typography variant="subtitle2" sx={{ mb: 1, textAlign: 'center' }}>Bạn</Typography>
+          <Box sx={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+            <video ref={localVideoRef} autoPlay muted style={{ width: '100%', height: '100%', objectFit: 'contain' }} />
+          </Box>
         </Paper>
-        <Paper variant="outlined" sx={{ flex: 1, p: 1, overflow: 'auto' }}>
-          <Typography variant="subtitle2" sx={{ mb: 1 }}><GroupIcon fontSize="small" sx={{ mr: 1 }} />Người tham gia</Typography>
-          <Box id="remote-videos" />
+        <Paper variant="outlined" sx={{ flex: 1, p: 1, display: 'flex', flexDirection: 'column' }}>
+          <Typography variant="subtitle2" sx={{ mb: 1, textAlign: 'center' }}><GroupIcon fontSize="small" sx={{ mr: 1 }} />Người khác</Typography>
+          <Box sx={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+            {remoteStream ? (
+              <video ref={remoteVideoRef} autoPlay style={{ width: '100%', height: '100%', objectFit: 'contain' }} />
+            ) : (
+              <Typography variant="body2" color="text.secondary">Đang chờ người khác tham gia...</Typography>
+            )}
+          </Box>
         </Paper>
       </Stack>
       <Divider sx={{ my: 2 }} />
@@ -253,7 +258,8 @@ const VideoCall: React.FC = () => {
             {audioEnabled ? <MicIcon /> : <MicOffIcon />}
           </IconButton>
         </Tooltip>
-        {!screenSharing ? (
+        {/* TODO: ERROR IN Share Screen, fix it later */}
+        {/* {!screenSharing ? (
           <Tooltip title="Chia sẻ màn hình">
             <IconButton color="primary" onClick={startScreenShare}>
               <ScreenShareIcon />
@@ -265,7 +271,7 @@ const VideoCall: React.FC = () => {
               <StopScreenShareIcon />
             </IconButton>
           </Tooltip>
-        )}
+        )} */}
         <Tooltip title="Kết thúc cuộc gọi">
           <IconButton color="error" onClick={handleEndCall}>
             <CallEndIcon />
