@@ -15,12 +15,12 @@ const ImagePaste: React.FC<ImagePasteProps> = ({ onImageUploaded, disabled = fal
 
   const handleImageUpload = useCallback(async (file: File) => {
     if (!file.type.startsWith('image/')) {
-      setError('Please select an image file');
+      setError('Vui lòng chọn một tệp hình ảnh');
       return;
     }
 
     if (file.size > 10 * 1024 * 1024) { // 10MB limit
-      setError('Image size must be less than 10MB');
+      setError('Kích thước ảnh phải nhỏ hơn 10MB');
       return;
     }
 
@@ -34,7 +34,7 @@ const ImagePaste: React.FC<ImagePasteProps> = ({ onImageUploaded, disabled = fal
       const response = await uploadImage(formData);
       onImageUploaded(response.imageUrl, response.filename, response.size);
     } catch (error: any) {
-      setError(error.response?.data?.error || 'Failed to upload image');
+      setError(error.response?.data?.error || 'Tải ảnh lên thất bại');
     } finally {
       setUploading(false);
     }
@@ -75,7 +75,7 @@ const ImagePaste: React.FC<ImagePasteProps> = ({ onImageUploaded, disabled = fal
 
   return (
     <>
-      <Tooltip title={disabled ? "Image upload disabled" : "Upload image (Ctrl+V or click)"}>
+      <Tooltip title={disabled ? "Tải ảnh bị vô hiệu hóa" : "Tải ảnh (Ctrl+V hoặc nhấp)"}>
         <span>
           <IconButton
             onClick={() => fileInputRef.current?.click()}

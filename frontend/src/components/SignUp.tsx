@@ -21,7 +21,7 @@ function Copyright(props: any) {
     <Typography variant="body2" color="text.secondary" align="center" {...props}>
       {'Copyright © '}
       <Link color="inherit" to="https://mui.com/">
-        Your Website
+        Trang Web Của Bạn
       </Link>{' '}
       {new Date().getFullYear()}
       {'.'}
@@ -101,7 +101,7 @@ export const SignUp = () => {
             <LockOutlinedIcon />
           </Avatar>
           <Typography component="h1" variant="h5">
-            Sign up
+            Đăng ký
           </Typography>
           <Box component="form" noValidate onSubmit={handleSendRegisterOtp} sx={{ mt: 3 }}>
             <Grid container spacing={2}>
@@ -112,7 +112,7 @@ export const SignUp = () => {
                   required
                   fullWidth
                   id="name"
-                  label="Name"
+                  label="Họ và tên"
                   autoFocus
                   value={name}
                   onChange={(e) => setName(e.target.value)}
@@ -123,7 +123,7 @@ export const SignUp = () => {
                   required
                   fullWidth
                   id="email"
-                  label="Email Address"
+                  label="Địa chỉ Email"
                   name="email"
                   autoComplete="email"
                   value={email}
@@ -136,7 +136,7 @@ export const SignUp = () => {
                     required
                     fullWidth
                     name="otp"
-                    label="OTP"
+                    label="Mã OTP"
                     type="text"
                     id="otp"
                     autoComplete="one-time-code"
@@ -170,7 +170,7 @@ export const SignUp = () => {
             <Grid container justifyContent="flex-end">
               <Grid item>
                 <Link to="/" className='underline text-sm text-blue-500 hover:"'>
-                  Already have an account? Sign in
+                  Đã có tài khoản? Đăng nhập
                 </Link>
               </Grid>
             </Grid>

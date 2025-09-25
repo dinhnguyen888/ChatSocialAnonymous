@@ -93,10 +93,10 @@ const FriendList: React.FC = () => {
 
       // Alerts for room creation flow
       const handleCreateRoomError = (msg: string) => {
-        alert(msg || 'Failed to create room');
+        alert(msg || 'Tạo phòng thất bại');
       };
       const handleRoomCreated = (savedRoom: { roomName: string }) => {
-        alert(`Room "${savedRoom.roomName}" created successfully`);
+        alert(`Tạo phòng "${savedRoom.roomName}" thành công`);
         setOpenDialog(false);
         setRoomName('');
       };
@@ -146,7 +146,7 @@ const FriendList: React.FC = () => {
 
   const handleSendFriendRequest = () => {
     if (isGuest) {
-      alert('Guest accounts cannot send friend requests');
+      alert('Tài khoản khách không thể gửi lời mời kết bạn');
       return;
     }
     const userId = userData.id;
@@ -157,12 +157,12 @@ const FriendList: React.FC = () => {
 
   const handleCreateRoom = () => {
     if (isGuest) {
-      alert('Guest accounts cannot create rooms');
+      alert('Tài khoản khách không thể tạo phòng');
       return;
     }
     const userId = userData.id;
     if (!roomName || !roomName.trim()) {
-      alert('Please enter a room name');
+      alert('Vui lòng nhập tên phòng');
       return;
     }
     if (userId && roomName) {
@@ -186,7 +186,7 @@ const FriendList: React.FC = () => {
         <IconButton color="primary" aria-label="add friend or room">
           <AddIcon />
         </IconButton>
-        <ListItemText primary="Add Friend or Room" />
+        <ListItemText primary="Thêm bạn bè hoặc phòng" />
       </ListItemButton>
       {items.map((item) => (
         <ListItemButton
@@ -210,19 +210,19 @@ const FriendList: React.FC = () => {
     <Dialog open={openDialog} onClose={handleCloseDialog}>
       <DialogTitle>
         <Tabs value={formTab} onChange={handleFormTabChange} aria-label="form tabs">
-          <Tab label="Add Friend" />
-          <Tab label="Create Room" />
+          <Tab label="Thêm bạn" />
+          <Tab label="Tạo phòng" />
         </Tabs>
       </DialogTitle>
       <DialogContent>
         {isGuest && (
           <Alert severity="info" sx={{ mb: 2 }}>
-            Guest accounts cannot send friend requests or create rooms. You can chat in /general. Link your email to unlock full features.
+            Tài khoản khách không thể gửi lời mời kết bạn hoặc tạo phòng. Bạn có thể trò chuyện trong /general. Liên kết email để mở khóa đầy đủ tính năng.
           </Alert>
         )}
         {formTab === 0 ? (
           <TextField
-            label="Friend ID"
+            label="ID bạn bè"
             value={friendId}
             onChange={(e) => setFriendId(e.target.value)}
             fullWidth
@@ -231,7 +231,7 @@ const FriendList: React.FC = () => {
           />
         ) : (
           <TextField
-            label="Room Name"
+            label="Tên phòng"
             value={roomName}
             onChange={(e) => setRoomName(e.target.value)}
             fullWidth
@@ -241,13 +241,13 @@ const FriendList: React.FC = () => {
         )}
       </DialogContent>
       <DialogActions>
-        <Button onClick={handleCloseDialog} color="secondary">Cancel</Button>
+        <Button onClick={handleCloseDialog} color="secondary">Hủy</Button>
         <Button
           onClick={formTab === 0 ? handleSendFriendRequest : handleCreateRoom}
           color="primary"
           disabled={isGuest}
         >
-          {formTab === 0 ? 'Send Friend Request' : 'Create Room'}
+          {formTab === 0 ? 'Gửi lời mời kết bạn' : 'Tạo phòng'}
         </Button>
       </DialogActions>
     </Dialog>
@@ -259,8 +259,8 @@ const FriendList: React.FC = () => {
         {selectedTab === 0 ? renderList(friendRooms) : renderList(chatRooms)}
       </Box>
       <BottomNavigation value={selectedTab} onChange={handleTabChange} sx={{ borderTop: '1px solid #ddd' }}>
-        <BottomNavigationAction label="Friends" icon={<PeopleIcon />} />
-        <BottomNavigationAction label="Chat Rooms" icon={<ChatIcon />} />
+        <BottomNavigationAction label="Bạn bè" icon={<PeopleIcon />} />
+        <BottomNavigationAction label="Phòng chat" icon={<ChatIcon />} />
       </BottomNavigation>
       {renderDialog()}
     </Box>

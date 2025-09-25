@@ -73,12 +73,12 @@ const FriendRequest: React.FC = () => {
             <Grid container spacing={2} justifyContent="flex-end">
               <Grid item>
                 <Button variant="contained" color="primary" onClick={() => handleAccept(request.id,request.name)}>
-                  Accept
+                  Chấp nhận
                 </Button>
               </Grid>
               <Grid item>
                 <Button variant="contained" color="secondary" onClick={() => handleDecline(request.id)}>
-                  Decline
+                  Từ chối
                 </Button>
               </Grid>
             </Grid>

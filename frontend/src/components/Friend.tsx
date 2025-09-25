@@ -29,7 +29,7 @@ const Friend: React.FC = () => {
 
   const handleDeleteFriend = (friendId: string) => {
       // eslint-disable-next-line no-restricted-globals
-    const confirmed = confirm('Do you want to delete your friend?');
+    const confirmed = confirm('Bạn có chắc muốn xóa bạn bè không?');
     
     if (confirmed) {
         socket.emit('deleteFriend', { ownerId: userData.id, friendId });

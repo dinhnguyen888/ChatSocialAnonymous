@@ -66,7 +66,7 @@ const VideoCall: React.FC = () => {
         });
 
       } catch (error) {
-        alert('Failed to access camera and microphone.');
+        alert('Không thể truy cập camera và micro.');
       }
     };
 
@@ -108,7 +108,7 @@ const VideoCall: React.FC = () => {
         onClick={handleEndCall}
         className="mt-4 px-4 py-2 bg-red-500 text-white rounded-lg"
       >
-        End Call
+        Kết thúc cuộc gọi
       </button>
     </div>
   );

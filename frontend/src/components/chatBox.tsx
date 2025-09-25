@@ -56,7 +56,7 @@ const ChatBox: React.FC = () => {
         console.log("check member in members state", members);
     } )
     socket.on('leaveRoomSuccess', (roomName:string) => {
-      alert(`You have left the room ${roomName}`);
+      alert(`Bạn đã rời khỏi phòng ${roomName}`);
       window.location.reload()
     })
     socket.on('getMemberError', (msg) =>{
@@ -169,7 +169,7 @@ const ChatBox: React.FC = () => {
         <AppBar position="static">
           <Toolbar>
             <Typography variant="h6" className="flex-grow">
-              Chat App
+              Ứng dụng trò chuyện
             </Typography>
             <IconButton color="inherit" onClick={handleClickVideoCall}>
               <VideoCallIcon />
@@ -228,7 +228,7 @@ const ChatBox: React.FC = () => {
           <TextField
             variant="outlined"
             fullWidth
-            placeholder="Type a message..."
+            placeholder="Nhập tin nhắn..."
             value={newMessage}
             onChange={(e) => setNewMessage(e.target.value)}
             onKeyPress={handleKeyPress}
@@ -247,33 +247,33 @@ const ChatBox: React.FC = () => {
           </div>
           <div className="p-4">
             <h1 className="flex items-center gap-2 p-2 text-lg font-bold text-gray-700">
-              Room Name: {room.name}
+              Tên phòng: {room.name}
             </h1>
             <h1 className="flex items-center gap-2 p-2 text-gray-400">
               ID: {room.id}
             </h1>
             <div className="mt-6">
               <MenuItem className="flex items-center gap-2 p-2 hover:bg-gray-100 rounded-md" onClick={handleOpenFriendToAddMember}>
-                Add Member
+                Thêm thành viên
               </MenuItem>
               <MenuItem className="flex items-center gap-2 p-2 hover:bg-gray-100 rounded-md" onClick={handleOpenMembersDialog}>
-                All Member
+                Tất cả thành viên
               </MenuItem>
               <MenuItem className="flex items-center gap-2 p-2 hover:bg-red-100 rounded-md text-red-600" onClick={handleLeaveRoom}>
-                Leave Room
+                Rời phòng
               </MenuItem>
             </div>
           </div>
         </div>
         <Dialog open={showFriendListToAddMember} onClose={handleCloseFriendsList}>
-          <DialogTitle>Add Members</DialogTitle>
+          <DialogTitle>Thêm thành viên</DialogTitle>
           <DialogContent>
             <List>
               {friends.map((friend) => (
                 <ListItem key={friend._id} sx={{ justifyContent: 'space-between' }}>
                   <ListItemText primary={friend.name} />
                   <Button variant="contained" startIcon={<AddIcon />} color="primary" style={{ width: "20%" }} onClick={() => handleAddMember(friend._id)}>
-                    Add
+                    Thêm
                   </Button>
                 </ListItem>
               ))}
@@ -281,12 +281,12 @@ const ChatBox: React.FC = () => {
           </DialogContent>
           <DialogActions>
             <Button onClick={handleCloseFriendsList} color="primary">
-              Close
+              Đóng
             </Button>
           </DialogActions>
         </Dialog>
         <Dialog open={showMembersDialog} onClose={handleCloseMembersDialog}>
-          <DialogTitle>Room Members</DialogTitle>
+          <DialogTitle>Thành viên trong phòng</DialogTitle>
           <DialogContent>
             <List>
               {members.map((member, index) => (
@@ -298,12 +298,12 @@ const ChatBox: React.FC = () => {
           </DialogContent>
           <DialogActions>
             <Button onClick={handleCloseMembersDialog} color="primary">
-              Close
+              Đóng
             </Button>
           </DialogActions>
         </Dialog>
       </div>
-    ) : <div className='w-full'><h1 className='text-center mx-auto my-64 font-mono text-2xl font-bold text-blue-400'>Select Friend or Room to chat!!!</h1></div>}
+    ) : <div className='w-full'><h1 className='text-center mx-auto my-64 font-mono text-2xl font-bold text-blue-400'>Chọn bạn bè hoặc phòng để trò chuyện!!!</h1></div>}
   </>
   );
 };

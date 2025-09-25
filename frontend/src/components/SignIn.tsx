@@ -23,7 +23,7 @@ function Copyright(props: any) {
     <Typography variant="body2" color="text.secondary" align="center" {...props}>
       {'Copyright © '}
       <Link to="https://mui.com/" style={{ color: 'inherit' }}>
-        Your Website
+        Trang Web Của Bạn
       </Link>{' '}
       {new Date().getFullYear()}
       {'.'}
@@ -75,11 +75,11 @@ export const Login = () => {
       console.log('Guest quickstart successful:', response);
       console.log('Check user account info:', userAccount);
       console.log('Check user data:', userData);
-      alert('Welcome, Guest!');
+      alert('Chào mừng, Khách!');
       navigate('/chat');
     } catch (error) {
       console.error('Error during guest quickstart:', error);
-      alert('Guest quickstart failed');
+      alert('Bắt đầu nhanh với tư cách Khách thất bại');
     } finally {
       setLoading(false);
     }
@@ -91,7 +91,7 @@ export const Login = () => {
     try {
       await loginWithOTP({ email });
       console.log('OTP sent');
-      alert(`OTP was sent to ${email}`);
+      alert(`OTP đã được gửi đến ${email}`);
       setOtpSent(true);
     } catch (error) {
       console.error('Error sending OTP:', error);
@@ -122,7 +122,7 @@ export const Login = () => {
       socket.emit('getAllRoomById', userData.id);
       socket.emit('showRequest', userData.id);
       console.log('OTP validation successful:', response);
-      alert('OTP validation successful');
+      alert('Xác thực OTP thành công');
      window.location.href = '/chat';
     //  navigate('/chat')
     } catch (error) {
@@ -153,7 +153,7 @@ export const Login = () => {
             <LockOutlinedIcon />
           </Avatar>
           <Typography component="h1" variant="h5">
-            Sign in
+            Đăng nhập
           </Typography>
           <Box component="form" onSubmit={handleSubmit} noValidate sx={{ mt: 1 }}>
             {!otpMode ? (
@@ -163,7 +163,7 @@ export const Login = () => {
                   required
                   fullWidth
                   id="name"
-                  label="Your Name"
+                  label="Tên của bạn"
                   name="name"
                   autoFocus
                   value={name}
@@ -171,7 +171,7 @@ export const Login = () => {
                 />
                 <FormControlLabel
                   control={<Checkbox value="remember" color="primary" checked={rememberMe} onChange={(e) => setRememberMe(e.target.checked)} />}
-                  label="Remember me"
+                  label="Ghi nhớ tôi"
                 />
                 <Button
                   type="submit"
@@ -180,7 +180,7 @@ export const Login = () => {
                   sx={{ mt: 3, mb: 2 }}
                   disabled={loading}
                 >
-                  {loading ? <CircularProgress size={24} /> : 'Quick Start as Guest'}
+                  {loading ? <CircularProgress size={24} /> : 'Bắt đầu nhanh với tư cách Khách'}
                 </Button>
                 <Button
                   fullWidth
@@ -188,7 +188,7 @@ export const Login = () => {
                   onClick={handleLoginWithOtp}
                   sx={{ mt: 1 }}
                 >
-                  Login with OTP
+                  Đăng nhập với OTP
                 </Button>
               </>
             ) : (
@@ -200,7 +200,7 @@ export const Login = () => {
                       required
                       fullWidth
                       id="name"
-                      label="Your Name"
+                      label="Tên của bạn"
                       name="name"
                       value={name}
                       onChange={(e) => setName(e.target.value)}
@@ -210,7 +210,7 @@ export const Login = () => {
                       required
                       fullWidth
                       id="email"
-                      label="Email Address"
+                      label="Địa chỉ Email"
                       name="email"
                       autoComplete="email"
                       autoFocus
@@ -224,7 +224,7 @@ export const Login = () => {
                       sx={{ mt: 3, mb: 2 }}
                       disabled={loading}
                     >
-                      {loading ? <CircularProgress size={24} /> : 'Send OTP'}
+                      {loading ? <CircularProgress size={24} /> : 'Gửi OTP'}
                     </Button>
                   </>
                 ) : (
@@ -248,7 +248,7 @@ export const Login = () => {
                       sx={{ mt: 3, mb: 2 }}
                       disabled={loading}
                     >
-                      {loading ? <CircularProgress size={24} /> : 'Validate OTP'}
+                      {loading ? <CircularProgress size={24} /> : 'Xác thực OTP'}
                     </Button>
                   </>
                 )}
@@ -258,13 +258,13 @@ export const Login = () => {
               <Grid item xs>
                 {otpMode && (
                   <Link to="#" className='underline text-sm text-blue-500 hover:"' onClick={() => setOtpMode(false)}>
-                    Back To Normal Login
+                    Quay lại Đăng nhập thường
                   </Link>
                 )}
               </Grid>
               <Grid item>
                 <Link to="/sign-up" className='underline text-sm text-blue-500 hover:"'>
-                  {"Sign Up"}
+                  {"Đăng ký"}
                 </Link>
               </Grid>
             </Grid>

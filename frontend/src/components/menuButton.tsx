@@ -86,22 +86,26 @@ const MenuButton: React.FC = () => {
           <List>
            
             <ListItem button onClick={() => handleMenuClick('Personal Information')}>
-              <ListItemText primary="Personal Info" />
+              <ListItemText primary="Thông tin cá nhân" />
             </ListItem>
             <ListItem button onClick={() => handleMenuClick('Friend Request')}>
-              <ListItemText primary="Friend Requests" />
+              <ListItemText primary="Lời mời kết bạn" />
             </ListItem>
             <ListItem button onClick={() => handleMenuClick('Friend')}>
-              <ListItemText primary="Friend" />
+              <ListItemText primary="Bạn bè" />
             </ListItem>
             <ListItem button onClick={() => handleMenuClick('Log out')}>
-              <ListItemText primary="Log out" />
+              <ListItemText primary="Đăng xuất" />
             </ListItem>
           </List>
         </Box>
       </Drawer>
       <Dialog open={dialogOpen} onClose={handleCloseDialog} maxWidth="sm" fullWidth>
-        <DialogTitle>{currentComponent}</DialogTitle>
+        <DialogTitle>
+          {currentComponent === 'Personal Information' ? 'Thông tin cá nhân' :
+           currentComponent === 'Friend Request' ? 'Lời mời kết bạn' :
+           currentComponent === 'Friend' ? 'Bạn bè' : currentComponent}
+        </DialogTitle>
         <DialogContent>
           {renderComponent()}
         </DialogContent>

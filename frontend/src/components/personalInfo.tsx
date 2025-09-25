@@ -31,7 +31,7 @@ const PersonalInfo: React.FC = () => {
     <Paper elevation={3} style={{ padding: '40px', margin: '20px', maxWidth: '600px', marginLeft: 'auto', marginRight: 'auto' }}>
       <Box mb={3}>
         <Typography variant="body1">
-          <strong>Name:</strong>
+          <strong>Họ và tên:</strong>
           {isEditingName ? (
             <TextField
               value={name}

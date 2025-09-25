@@ -1,4 +1,4 @@
-// App.tsx
+// Ứng dụng trò chuyện.tsx
 
 import React, { useEffect } from 'react';
 import { Box, Grid } from '@mui/material';
@@ -20,7 +20,7 @@ const ChatApp: React.FC = () => {
   const user = useUserStore((s) => s.userData);
  
 
-  // Example: Listen to changes in reload and do something
+  // Ví dụ: Lắng nghe các thay đổi trong reload và thực hiện hành động
   useEffect(() => {
     socket.on('connect',() =>{
       checkStatus()
@@ -77,7 +77,7 @@ const ChatApp: React.FC = () => {
             </Box>
           }
         />
-        {/* Example: Redirect to login if route not found */}
+        {/* Ví dụ: Chuyển hướng đến đăng nhập nếu không tìm thấy route */}
         <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>
     </Router>

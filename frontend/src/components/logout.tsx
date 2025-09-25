@@ -22,16 +22,16 @@ const LogoutConfirmation: React.FC<LogoutConfirmationProps> = ({ open, onClose }
 
   return (
     <Dialog open={open} onClose={onClose}>
-      <DialogTitle>Logout Confirmation</DialogTitle>
+      <DialogTitle>Xác nhận đăng xuất</DialogTitle>
       <DialogContent>
-        <Typography>Are you sure you want to logout?</Typography>
+        <Typography>Bạn có chắc chắn muốn đăng xuất không?</Typography>
       </DialogContent>
       <DialogActions>
         <Button onClick={onClose} color="secondary">
-          Cancel
+          Hủy
         </Button>
         <Button onClick={handleLogout} color="primary">
-          Logout
+          Đăng xuất
         </Button>
       </DialogActions>
     </Dialog>
