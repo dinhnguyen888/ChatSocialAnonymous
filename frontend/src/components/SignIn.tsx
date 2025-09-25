@@ -15,6 +15,7 @@ import CircularProgress from '@mui/material/CircularProgress';
 import { createTheme, ThemeProvider } from '@mui/material/styles';
 import { Link, useNavigate } from 'react-router-dom';
 import { getUserByID, login, loginWithOTP, validateOTP } from '../services/apiAccount';
+import socket, { setSocketAuthToken } from '../services/socket';
 import {useUserStore, User} from '../stores/userStore';
 
 function Copyright(props: any) {
@@ -64,6 +65,13 @@ export const Login = () => {
           token: response.token
       };
       setUserData(userData);
+      // refresh socket auth and reconnect using the new JWT
+      localStorage.setItem('token', response.token);
+      setSocketAuthToken(response.token);
+      // reload friend-related data
+      socket.emit('showAllFriends', userData.id);
+      socket.emit('getAllRoomById', userData.id);
+      socket.emit('showRequest', userData.id);
       console.log('Login successful:', response);
       console.log('Check user account info:', userAccount);
       console.log('Check user data:', userData);
@@ -106,6 +114,13 @@ export const Login = () => {
           token: response.token
       };
       setUserData(userData);
+      // refresh socket auth and reconnect using the new JWT
+      localStorage.setItem('token', response.token);
+      setSocketAuthToken(response.token);
+      // reload friend-related data
+      socket.emit('showAllFriends', userData.id);
+      socket.emit('getAllRoomById', userData.id);
+      socket.emit('showRequest', userData.id);
       console.log('OTP validation successful:', response);
       alert('OTP validation successful');
      window.location.href = '/chat';
