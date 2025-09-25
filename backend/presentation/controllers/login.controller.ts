@@ -22,8 +22,8 @@ export const login = async (req: Request, res: Response): Promise<void> => {
 };
 
 export const loginOTP = async (req: Request, res: Response): Promise<void> => {
-  const { email, name } = req.body;
-  const result = await AuthService.sendLoginOtp(email, name);
+  const { email } = req.body;
+  const result = await AuthService.sendLoginOtp(email);
   if ('error' in result) {
     res.status(result.status).json({ error: result.error });
     return;
@@ -57,6 +57,16 @@ export const deleteGuest = async (req: Request, res: Response) => {
   } catch (error) {
     res.status(500).json({ error: 'Internal server error' });
   }
+}
+
+export const registerOTP = async (req: Request, res: Response): Promise<void> => {
+  const { email, name } = req.body;
+  const result = await AuthService.registerSendOtp(email, name);
+  if ('error' in result) {
+    res.status(result.status).json({ error: result.error });
+    return;
+  }
+  res.status(200).json('OK');
 }
 
 export const linkEmailToGuest = async (req: Request, res: Response) => {

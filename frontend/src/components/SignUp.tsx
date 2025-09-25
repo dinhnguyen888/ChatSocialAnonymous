@@ -1,19 +1,21 @@
 import * as React from 'react';
+import { useState } from 'react';
 import Avatar from '@mui/material/Avatar';
 import Button from '@mui/material/Button';
 import CssBaseline from '@mui/material/CssBaseline';
 import TextField from '@mui/material/TextField';
-import FormControlLabel from '@mui/material/FormControlLabel';
-import Checkbox from '@mui/material/Checkbox';
 import Grid from '@mui/material/Grid';
 import Box from '@mui/material/Box';
 import LockOutlinedIcon from '@mui/icons-material/LockOutlined';
 import Typography from '@mui/material/Typography';
 import Container from '@mui/material/Container';
+import CircularProgress from '@mui/material/CircularProgress';
 import { createTheme, ThemeProvider } from '@mui/material/styles';
 import { Link, useNavigate } from 'react-router-dom';
 
-import {createAccount} from '../services/apiAccount'
+import { registerWithOTP, validateOTP, getUserByID } from '../services/apiAccount'
+import socket, { setSocketAuthToken } from '../services/socket';
+import { useUserStore, User } from '../stores/userStore';
 function Copyright(props: any) {
   return (
     <Typography variant="body2" color="text.secondary" align="center" {...props}>
@@ -31,33 +33,55 @@ const defaultTheme = createTheme();
 
 
 
-interface Account {
-  name: string;
-  email: string;
-  password: string;
-}
-
-
-
 export const SignUp = () => {
   const navigate = useNavigate()
-  const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
-    event.preventDefault();
-    const data = new FormData(event.currentTarget);
-    const account: Account = {
-      name: data.get('name') as string,
-      email: data.get('email') as string,
-      password: data.get('password') as string,
-    };
+  const [name, setName] = useState('');
+  const [email, setEmail] = useState('');
+  const [otp, setOtp] = useState('');
+  const [otpSent, setOtpSent] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const setUserData = useUserStore((s) => s.setUserData);
 
+  const handleSendRegisterOtp = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    setLoading(true);
     try {
-      const response = await createAccount(account);
-      console.log('Account created successfully:', response);
-      alert('Create account successfully')
-      navigate('/')
+      await registerWithOTP({ email, name });
+      setOtpSent(true);
+      alert(`OTP đã được gửi tới ${email}`);
     } catch (error) {
-      console.error('Error creating account:', error);
-      alert('Please provide complete account and password')
+      console.error('Error sending register OTP:', error);
+      alert('Gửi OTP thất bại');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleValidateOtp = async () => {
+    setLoading(true);
+    try {
+      const response = await validateOTP({ email, otp });
+      const userAccount = await getUserByID(response.id);
+      const userData: User = {
+        id: userAccount._id!,
+        email: userAccount.email!,
+        name: userAccount.name || name,
+        token: response.token,
+        role: 'User'
+      };
+      setUserData(userData);
+      localStorage.setItem('token', response.token);
+      setSocketAuthToken(response.token);
+      socket.emit('showAllFriends', userData.id);
+      socket.emit('getAllRoomById', userData.id);
+      socket.emit('showRequest', userData.id);
+      alert('Đăng ký và đăng nhập thành công');
+      navigate('/chat');
+    } catch (error) {
+      console.error('Error validating OTP:', error);
+      alert('Xác thực OTP thất bại');
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -79,7 +103,7 @@ export const SignUp = () => {
           <Typography component="h1" variant="h5">
             Sign up
           </Typography>
-          <Box component="form" noValidate onSubmit={handleSubmit} sx={{ mt: 3 }}>
+          <Box component="form" noValidate onSubmit={handleSendRegisterOtp} sx={{ mt: 3 }}>
             <Grid container spacing={2}>
               <Grid item xs={12} sm={12}>
                 <TextField
@@ -90,6 +114,8 @@ export const SignUp = () => {
                   id="name"
                   label="Name"
                   autoFocus
+                  value={name}
+                  onChange={(e) => setName(e.target.value)}
                 />
               </Grid>
               <Grid item xs={12}>
@@ -100,45 +126,47 @@ export const SignUp = () => {
                   label="Email Address"
                   name="email"
                   autoComplete="email"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
                 />
               </Grid>
-              <Grid item xs={12}>
-                <TextField
-                  required
-                  fullWidth
-                  name="password"
-                  label="Password"
-                  type="password"
-                  id="password"
-                  autoComplete="new-password"
-                />
-              </Grid>
-              <Grid item xs={12}>
-                <TextField
-                  required
-                  fullWidth
-                  name="retype_password"
-                  label="Retype Password"
-                  type="password"
-                  id="retype_password"
-                  autoComplete="new-password"
-                />
-              </Grid>
-              <Grid item xs={12}>
-                <FormControlLabel
-                  control={<Checkbox value="allowExtraEmails" color="primary" />}
-                  label="I want to receive inspiration, marketing promotions and updates via email."
-                />
-              </Grid>
+              {otpSent && (
+                <Grid item xs={12}>
+                  <TextField
+                    required
+                    fullWidth
+                    name="otp"
+                    label="OTP"
+                    type="text"
+                    id="otp"
+                    autoComplete="one-time-code"
+                    value={otp}
+                    onChange={(e) => setOtp(e.target.value)}
+                  />
+                </Grid>
+              )}
             </Grid>
-            <Button
-              type="submit"
-              fullWidth
-              variant="contained"
-              sx={{ mt: 3, mb: 2 }}
-            >
-              Sign Up
-            </Button>
+            {!otpSent ? (
+              <Button
+                type="submit"
+                fullWidth
+                variant="contained"
+                sx={{ mt: 3, mb: 2 }}
+                disabled={loading || !email || !name}
+              >
+                {loading ? <CircularProgress size={24} /> : 'Gửi OTP đăng ký'}
+              </Button>
+            ) : (
+              <Button
+                onClick={handleValidateOtp}
+                fullWidth
+                variant="contained"
+                sx={{ mt: 3, mb: 2 }}
+                disabled={loading || !otp}
+              >
+                {loading ? <CircularProgress size={24} /> : 'Xác thực OTP'}
+              </Button>
+            )}
             <Grid container justifyContent="flex-end">
               <Grid item>
                 <Link to="/" className='underline text-sm text-blue-500 hover:"'>

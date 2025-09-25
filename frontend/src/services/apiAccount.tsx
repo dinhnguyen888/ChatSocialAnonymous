@@ -4,7 +4,6 @@ import { appConfig } from "./config";
 interface Account{
     _id?:string,
     email:string,
-    password:string,
     name:string,
     role?: 'Guest' | 'User'
 }
@@ -55,7 +54,7 @@ export const guestQuickStart = async (name?: string) => {
 };
 
 
-export const loginWithOTP = async (payload: { email: string; name: string }) =>{
+export const loginWithOTP = async (payload: { email: string }) =>{
     const response = await axios.post(`${appConfig.apiBaseUrl}/loginOTP`, payload)
     return response.data
 }
@@ -63,6 +62,11 @@ export const loginWithOTP = async (payload: { email: string; name: string }) =>{
 
 export const validateOTP = async (validate:validateForm)=>{
     const response = await axios.post(`${appConfig.apiBaseUrl}/validateOTP`,validate)
+    return response.data
+}
+
+export const registerWithOTP = async (payload: { email: string; name: string }) =>{
+    const response = await axios.post(`${appConfig.apiBaseUrl}/registerOTP`, payload)
     return response.data
 }
 

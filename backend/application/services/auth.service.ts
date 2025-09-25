@@ -15,12 +15,7 @@ export const AuthService = {
   async sendLoginOtp(email: string, name: string) {
     if (!email) return { error: 'Email is required', status: 400 } as const;
     let account = await Account.findOne({ email });
-    if (!account) {
-      account = await Account.create({ email, name: name || '', role: 'User' });
-    } else if (name && !account.name) {
-      account.name = name;
-      await account.save();
-    }
+    if (!account) return { error: 'Account not found', status: 404 } as const;
     const ok = await sendOtp(email);
     return ok ? { ok: true, status: 200 } as const : { error: 'Failed', status: 500 } as const;
   },
@@ -39,6 +34,19 @@ export const AuthService = {
         }
       });
     });
+  },
+
+  async registerSendOtp(email: string, name: string) {
+    if (!email || !name) return { error: 'Email and name are required', status: 400 } as const;
+    let account = await Account.findOne({ email });
+    if (!account) {
+      account = await Account.create({ email, name, role: 'User' });
+    } else if (!account.name && name) {
+      account.name = name;
+      await account.save();
+    }
+    const ok = await sendOtp(email);
+    return ok ? { ok: true, status: 200 } as const : { error: 'Failed', status: 500 } as const;
   },
 
   async deleteGuestAccount(id: string) {

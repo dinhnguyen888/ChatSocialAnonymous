@@ -60,7 +60,6 @@ export const Login = () => {
       const userData: User = {
           id: userAccount._id!,
           email: userAccount.email || '',
-          password: userAccount.password || '',
           name: userAccount.name || name,
           token: response.token,
           role: 'Guest'
@@ -90,7 +89,7 @@ export const Login = () => {
   const handleSendOtp = async () => {
     setLoading(true);
     try {
-      await loginWithOTP({ email, name });
+      await loginWithOTP({ email });
       console.log('OTP sent');
       alert(`OTP was sent to ${email}`);
       setOtpSent(true);
@@ -110,7 +109,6 @@ export const Login = () => {
       const userData: User = {
           id: userAccount._id!,
           email: userAccount.email!,
-          password: userAccount.password!,
           name: userAccount.name!,
           token: response.token,
           role: 'User'

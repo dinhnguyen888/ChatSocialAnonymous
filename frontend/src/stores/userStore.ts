@@ -4,7 +4,6 @@ import { persist, createJSONStorage, PersistOptions } from 'zustand/middleware';
 export interface User {
   id?: string;
   email: string;
-  password: string;
   name: string;
   token?: string;
   role?: 'Guest' | 'User';
@@ -26,12 +25,12 @@ type MyPersist = (
 export const useUserStore = create<UserState>(
   (persist as MyPersist)(
     (set, get) => ({
-      userData: { id: '', email: '', password: '', name: '', token: '', role: undefined },
+      userData: { id: '', email: '', name: '', token: '', role: undefined },
       setUserData: (userData) => set({ userData }),
       updateUserData: (newUserData) => set((state: UserState) => ({
         userData: { ...state.userData, ...newUserData }
       })),
-      removeUserData: () => set({ userData: { id: '', email: '', password: '', name: '', token: '' } }),
+      removeUserData: () => set({ userData: { id: '', email: '', name: '', token: '' } }),
       getUserData: () => get().userData,
 
     }),
