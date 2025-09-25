@@ -94,11 +94,20 @@ export const friendController = (socket: Socket, io: Server) => {
 
     socket.on('joinFriendRoom', async (friendRoomId:string) =>{
        try{
-        await socket.join(friendRoomId);
-        socket.emit('joinSuccess', friendRoomId)
+        // Get friend room with participants
+        const friendRoom = await FriendRoom.findById(friendRoomId);
+        if (friendRoom) {
+          await socket.join(friendRoomId);
+          socket.emit('joinSuccess', {
+            roomId: friendRoomId,
+            participants: friendRoom.participants
+          });
+        } else {
+          socket.emit('errorJoinFriendRoom', 'Friend room not found');
+        }
        }
        catch(error){
-        socket.emit('errorJoinFriendRoom',error)
+        socket.emit('errorJoinFriendRoom', error)
        }
     })
 };

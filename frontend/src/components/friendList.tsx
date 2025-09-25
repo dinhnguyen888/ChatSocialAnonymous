@@ -11,7 +11,7 @@ import Alert from '@mui/material/Alert';
 import { useChatAppStore} from '../stores/countStateStore';
 
 const FriendList: React.FC = () => {
-  const {triggerReload, status,setRoomClicked, clickFriendRoom, setRoomData} = useChatAppStore()
+  const {triggerReload, status,setRoomClicked, clickFriendRoom, setRoomData, setCurrentRoomParticipants} = useChatAppStore()
   const [selectedTab, setSelectedTab] = useState(0);
   const [formTab, setFormTab] = useState(0);
   const [selectedItem, setSelectedItem] = useState<number | string | null>(null);
@@ -22,6 +22,11 @@ const FriendList: React.FC = () => {
   const {getFriends,setFriends,addFriend} = useFriendStore()
   const {members, setMembers} = useRoomStore();
   const { friendRooms, chatRooms, setFriendRooms, setChatRooms,getFriendRooms,getChatRooms, addFriendRoom, addChatRoom } = useRoomStore();
+  
+  // Debug: Log friend rooms whenever they change
+  useEffect(() => {
+    console.log('Friend rooms updated:', friendRooms);
+  }, [friendRooms]);
   
   const userData = getUserData();
   const isGuest = userData?.role === 'Guest';
@@ -79,9 +84,26 @@ const FriendList: React.FC = () => {
         console.log(msg)
       };
 
-      const handleJoinFriendRoom = (msg: string) => {
-        // alert(msg);
-        console.log(msg)
+      const handleJoinFriendRoom = (data: any) => {
+        console.log('Join friend room data:', data);
+        // Store participants info for video call
+        if (data && data.participants) {
+          console.log('Updating friend rooms with participants:', data.participants);
+          
+          // Store in ChatAppStore for immediate access
+          setCurrentRoomParticipants(data.participants);
+          
+          // Also update friendRooms for consistency
+          const updatedFriendRooms = friendRooms.map(room => {
+            if (room.id === data.roomId) {
+              console.log('Found room to update:', room.id, 'with participants:', data.participants);
+              return { ...room, participants: data.participants };
+            }
+            return room;
+          });
+          console.log('Updated friend rooms:', updatedFriendRooms);
+          setFriendRooms(updatedFriendRooms);
+        }
       };
 
       socket.on('allFriends', handleAllFriendRooms);

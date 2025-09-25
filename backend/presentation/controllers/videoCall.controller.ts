@@ -1,46 +1,15 @@
 import { Server, Socket } from 'socket.io';
-import Friend from '../../domain/models/friend.entity';
-import mongoose from 'mongoose';
 
 export const videoCallController = (socket: Socket, io: Server) => {
   const user = (socket as any).user;
   const isGuest = user && user.role === 'Guest';
 
-  // Check if two users are friends
-  const areFriends = async (userId1: string, userId2: string): Promise<boolean> => {
-    if (isGuest) return false; // Guests cannot make video calls
-    
-    try {
-      const friend1 = await Friend.findOne({ ownerId: userId1 });
-      const friend2 = await Friend.findOne({ ownerId: userId2 });
-      
-      if (!friend1 || !friend2) return false;
-      
-      // Check if they are mutual friends
-      const isFriend1To2 = friend1.friendId.includes(new mongoose.Types.ObjectId(userId2));
-      const isFriend2To1 = friend2.friendId.includes(new mongoose.Types.ObjectId(userId1));
-      
-      return isFriend1To2 && isFriend2To1;
-    } catch (error) {
-      console.error('Error checking friendship:', error);
-      return false;
-    }
-  };
+  // Deprecated friend-checking for video calls: frontend and UX now use roomId
 
-  socket.on('join-video-call', async ({ roomId, peerId, targetUserId }) => {
+  socket.on('join-video-call', async ({ roomId, peerId }) => {
     try {
       if (isGuest) {
         return socket.emit('video-call-error', 'Guests cannot make video calls');
-      }
-
-      if (!targetUserId) {
-        return socket.emit('video-call-error', 'Target user is required');
-      }
-
-      // Check if users are friends
-      const friends = await areFriends(user.id, targetUserId);
-      if (!friends) {
-        return socket.emit('video-call-error', 'You can only video call your friends');
       }
 
       // Join the video call room
@@ -64,16 +33,10 @@ export const videoCallController = (socket: Socket, io: Server) => {
     }
   });
 
-  socket.on('video-call-offer', async ({ roomId, offer, targetUserId }) => {
+  socket.on('video-call-offer', async ({ roomId, offer }) => {
     try {
       if (isGuest) {
         return socket.emit('video-call-error', 'Guests cannot make video calls');
-      }
-
-      // Check if users are friends
-      const friends = await areFriends(user.id, targetUserId);
-      if (!friends) {
-        return socket.emit('video-call-error', 'You can only video call your friends');
       }
 
       socket.to(roomId).emit('video-call-offer', { offer, from: user.id });

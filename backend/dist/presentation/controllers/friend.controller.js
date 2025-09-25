@@ -112,8 +112,18 @@ const friendController = (socket, io) => {
     }));
     socket.on('joinFriendRoom', (friendRoomId) => __awaiter(void 0, void 0, void 0, function* () {
         try {
-            yield socket.join(friendRoomId);
-            socket.emit('joinSuccess', friendRoomId);
+            // Get friend room with participants
+            const friendRoom = yield friendRoom_entity_1.default.findById(friendRoomId);
+            if (friendRoom) {
+                yield socket.join(friendRoomId);
+                socket.emit('joinSuccess', {
+                    roomId: friendRoomId,
+                    participants: friendRoom.participants
+                });
+            }
+            else {
+                socket.emit('errorJoinFriendRoom', 'Friend room not found');
+            }
         }
         catch (error) {
             socket.emit('errorJoinFriendRoom', error);

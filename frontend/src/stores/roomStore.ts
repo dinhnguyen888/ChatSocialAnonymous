@@ -14,7 +14,7 @@ export interface Room {
   id: string;
   name: string;
   avatar: string;
-
+  participants?: string[]; // Add participants for friend rooms
 }
 
 

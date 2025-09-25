@@ -13,13 +13,14 @@ import { MessageData, useMessage } from '../stores/messageStore';
 import { useUserStore } from '../stores/userStore';
 import { useChatAppStore } from '../stores/countStateStore';
 import { useFriendStore } from '../stores/friendStore';
-import { Navigate, useNavigate } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import { useRoomStore } from '../stores/roomStore';
 
 const ChatBox: React.FC = () => {
   const { getMessage, setMessage, addMessage, deleteMessage } = useMessage();
-  const { getRoomClicked, friendRoomClicked, room, triggerReload ,roomClick} = useChatAppStore();
+  const { getRoomClicked, friendRoomClicked, room, triggerReload ,roomClick, currentRoomParticipants} = useChatAppStore();
   const { friends } = useFriendStore();
+  const { friendRooms } = useRoomStore();
   const messages = getMessage();
   const roomId = getRoomClicked();
   const [newMessage, setNewMessage] = useState('');
@@ -53,7 +54,7 @@ const ChatBox: React.FC = () => {
     socket.on('allMember', (roomMember) =>{
         
         setMembers(roomMember);
-        console.log("check member in members state", members);
+        console.log("check member in members state", roomMember);
     } )
     socket.on('leaveRoomSuccess', (roomName:string) => {
       alert(`Bạn đã rời khỏi phòng ${roomName}`);
@@ -69,7 +70,7 @@ const ChatBox: React.FC = () => {
       socket.off('deletedMessage', handleDeleteMessage);
       socket.off('leaveRoomSuccess');
     };
-  }, [roomId, setMessage, deleteMessage]);
+  }, [roomId, setMessage, deleteMessage, setMembers]);
 
   useEffect(() => {
     if (roomId) {
@@ -158,8 +159,12 @@ const ChatBox: React.FC = () => {
     setIsMenuOpen(false);
   };
 
-  const handleClickVideoCall = () =>{
-    window.open('/video-call')
+  const handleClickVideoCall = () => {
+    if (!roomId) {
+      alert('Không tìm thấy phòng hiện tại để gọi video.');
+      return;
+    }
+    window.open(`/video-call?roomId=${roomId}`);
   }
 
   return (
