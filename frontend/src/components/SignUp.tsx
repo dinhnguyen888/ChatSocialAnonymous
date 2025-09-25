@@ -16,18 +16,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import { registerWithOTP, validateOTP, getUserByID } from '../services/apiAccount'
 import socket, { setSocketAuthToken } from '../services/socket';
 import { useUserStore, User } from '../stores/userStore';
-function Copyright(props: any) {
-  return (
-    <Typography variant="body2" color="text.secondary" align="center" {...props}>
-      {'Copyright © '}
-      <Link color="inherit" to="https://mui.com/">
-        Trang Web Của Bạn
-      </Link>{' '}
-      {new Date().getFullYear()}
-      {'.'}
-    </Typography>
-  );
-}
+
 
 const defaultTheme = createTheme();
 

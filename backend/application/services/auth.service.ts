@@ -12,7 +12,7 @@ export const AuthService = {
     return { token, id: account._id.toString(), status: 200 } as const;
   },
 
-  async sendLoginOtp(email: string, name: string) {
+  async sendLoginOtp(email: string) {
     if (!email) return { error: 'Email is required', status: 400 } as const;
     let account = await Account.findOne({ email });
     if (!account) return { error: 'Account not found', status: 404 } as const;

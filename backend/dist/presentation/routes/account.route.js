@@ -16,6 +16,7 @@ router.get('/accounts/:id', [account_controller_1.getAccountByID]);
 router.delete('/accounts/:id', [account_controller_1.deleteAccount]);
 router.post('/login', login_controller_1.login);
 router.post('/loginOTP', login_controller_1.loginOTP);
+router.post('/registerOTP', login_controller_1.registerOTP);
 router.post('/validateOTP', login_controller_1.validateOTP);
 router.delete('/guest/:id', login_controller_1.deleteGuest);
 router.post('/link-email', login_controller_1.linkEmailToGuest);

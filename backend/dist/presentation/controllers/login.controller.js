@@ -9,7 +9,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.verifyEmailLink = exports.linkEmailToGuest = exports.deleteGuest = exports.validateOTP = exports.loginOTP = exports.login = void 0;
+exports.verifyEmailLink = exports.linkEmailToGuest = exports.registerOTP = exports.deleteGuest = exports.validateOTP = exports.loginOTP = exports.login = void 0;
 const auth_service_1 = require("../../application/services/auth.service");
 const room_service_1 = require("../../application/services/room.service");
 const login = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
@@ -34,8 +34,8 @@ const login = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
 });
 exports.login = login;
 const loginOTP = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    const { email, name } = req.body;
-    const result = yield auth_service_1.AuthService.sendLoginOtp(email, name);
+    const { email } = req.body;
+    const result = yield auth_service_1.AuthService.sendLoginOtp(email);
     if ('error' in result) {
         res.status(result.status).json({ error: result.error });
         return;
@@ -73,6 +73,16 @@ const deleteGuest = (req, res) => __awaiter(void 0, void 0, void 0, function* ()
     }
 });
 exports.deleteGuest = deleteGuest;
+const registerOTP = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    const { email, name } = req.body;
+    const result = yield auth_service_1.AuthService.registerSendOtp(email, name);
+    if ('error' in result) {
+        res.status(result.status).json({ error: result.error });
+        return;
+    }
+    res.status(200).json('OK');
+});
+exports.registerOTP = registerOTP;
 const linkEmailToGuest = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const { guestId, email } = req.body;

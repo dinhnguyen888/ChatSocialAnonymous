@@ -13,11 +13,6 @@ const accountSchema = new Schema({
         sparse: true,
         default: undefined
     },
-    password: {
-        type: String,
-        required: false,
-        default: ''
-    },
     name: {
         type: String,
         require: false,

@@ -18,18 +18,7 @@ import { getUserByID, guestQuickStart, loginWithOTP, validateOTP } from '../serv
 import socket, { setSocketAuthToken } from '../services/socket';
 import {useUserStore, User} from '../stores/userStore';
 
-function Copyright(props: any) {
-  return (
-    <Typography variant="body2" color="text.secondary" align="center" {...props}>
-      {'Copyright © '}
-      <Link to="https://mui.com/" style={{ color: 'inherit' }}>
-        Trang Web Của Bạn
-      </Link>{' '}
-      {new Date().getFullYear()}
-      {'.'}
-    </Typography>
-  );
-}
+
 
 const defaultTheme = createTheme();
 
@@ -195,7 +184,7 @@ export const Login = () => {
               <>
                 {!otpSent ? (
                   <>
-                    <TextField
+                    {/* <TextField
                       margin="normal"
                       required
                       fullWidth
@@ -204,7 +193,7 @@ export const Login = () => {
                       name="name"
                       value={name}
                       onChange={(e) => setName(e.target.value)}
-                    />
+                    /> */}
                     <TextField
                       margin="normal"
                       required
@@ -258,7 +247,7 @@ export const Login = () => {
               <Grid item xs>
                 {otpMode && (
                   <Link to="#" className='underline text-sm text-blue-500 hover:"' onClick={() => setOtpMode(false)}>
-                    Quay lại Đăng nhập thường
+                    Quay lại Đăng nhập nhanh
                   </Link>
                 )}
               </Grid>
@@ -270,7 +259,7 @@ export const Login = () => {
             </Grid>
           </Box>
         </Box>
-        <Copyright sx={{ mt: 5 }} />
+       
       </Container>
     </ThemeProvider>
   );

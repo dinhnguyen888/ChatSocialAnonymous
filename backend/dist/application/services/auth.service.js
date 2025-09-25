@@ -27,18 +27,13 @@ exports.AuthService = {
             return { token, id: account._id.toString(), status: 200 };
         });
     },
-    sendLoginOtp(email, name) {
+    sendLoginOtp(email) {
         return __awaiter(this, void 0, void 0, function* () {
             if (!email)
                 return { error: 'Email is required', status: 400 };
             let account = yield account_entity_1.default.findOne({ email });
-            if (!account) {
-                account = yield account_entity_1.default.create({ email, name: name || '', role: 'User' });
-            }
-            else if (name && !account.name) {
-                account.name = name;
-                yield account.save();
-            }
+            if (!account)
+                return { error: 'Account not found', status: 404 };
             const ok = yield (0, otp_util_1.sendOtp)(email);
             return ok ? { ok: true, status: 200 } : { error: 'Failed', status: 500 };
         });
@@ -58,6 +53,22 @@ exports.AuthService = {
                     resolve({ error: message, status: 401 });
                 }
             });
+        });
+    },
+    registerSendOtp(email, name) {
+        return __awaiter(this, void 0, void 0, function* () {
+            if (!email || !name)
+                return { error: 'Email and name are required', status: 400 };
+            let account = yield account_entity_1.default.findOne({ email });
+            if (!account) {
+                account = yield account_entity_1.default.create({ email, name, role: 'User' });
+            }
+            else if (!account.name && name) {
+                account.name = name;
+                yield account.save();
+            }
+            const ok = yield (0, otp_util_1.sendOtp)(email);
+            return ok ? { ok: true, status: 200 } : { error: 'Failed', status: 500 };
         });
     },
     deleteGuestAccount(id) {
