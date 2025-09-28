@@ -9,7 +9,11 @@ import { getUserByID } from '../services/apiAccount';
 import {useUserStore} from '../stores/userStore';
 import Friend from './Friend';
 
-const MenuButton: React.FC = () => {
+interface MenuButtonProps {
+  onGuestLogout?: () => Promise<void>;
+}
+
+const MenuButton: React.FC<MenuButtonProps> = ({ onGuestLogout }) => {
   const [isOpen, setIsOpen] = useState(false);
   const [currentComponent, setCurrentComponent] = useState('');
   const [dialogOpen, setDialogOpen] = useState(false);
@@ -110,7 +114,11 @@ const MenuButton: React.FC = () => {
           {renderComponent()}
         </DialogContent>
       </Dialog>
-      <LogoutConfirmation open={logoutDialogOpen} onClose={handleCloseLogoutDialog} />
+      <LogoutConfirmation 
+        open={logoutDialogOpen} 
+        onClose={handleCloseLogoutDialog} 
+        onGuestLogout={onGuestLogout}
+      />
     </Box>
   );
 };

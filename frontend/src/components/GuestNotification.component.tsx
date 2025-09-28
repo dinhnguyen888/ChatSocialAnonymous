@@ -87,8 +87,7 @@ const GuestNotification: React.FC<GuestNotificationProps> = ({ onEmailLinked }) 
       };
       setUserData(updatedUser);
       
-      // Update localStorage and socket auth
-      localStorage.setItem('token', response.token);
+      // Update socket auth
       setSocketAuthToken(response.token);
       
       // Reload socket data for new user role

@@ -55,7 +55,6 @@ export const Login = () => {
       };
       setUserData(userData);
       // refresh socket auth and reconnect using the new JWT
-      localStorage.setItem('token', response.token);
       setSocketAuthToken(response.token);
       // reload friend-related data
       socket.emit('showAllFriends', userData.id);
@@ -104,7 +103,6 @@ export const Login = () => {
       };
       setUserData(userData);
       // refresh socket auth and reconnect using the new JWT
-      localStorage.setItem('token', response.token);
       setSocketAuthToken(response.token);
       // reload friend-related data
       socket.emit('showAllFriends', userData.id);
@@ -112,8 +110,7 @@ export const Login = () => {
       socket.emit('showRequest', userData.id);
       console.log('OTP validation successful:', response);
       alert('Xác thực OTP thành công');
-     window.location.href = '/chat';
-    //  navigate('/chat')
+      navigate('/chat');
     } catch (error) {
       console.error('Error validating OTP:', error);
       alert(error);

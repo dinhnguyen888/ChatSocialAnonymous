@@ -30,7 +30,7 @@ export const useUserStore = create<UserState>(
       updateUserData: (newUserData) => set((state: UserState) => ({
         userData: { ...state.userData, ...newUserData }
       })),
-      removeUserData: () => set({ userData: { id: '', email: '', name: '', token: '' } }),
+      removeUserData: () => set({ userData: { id: '', email: '', name: '', token: '', role: undefined } }),
       getUserData: () => get().userData,
 
     }),
